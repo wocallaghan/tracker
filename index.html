@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>OneWeb Constellation Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -798,6 +798,90 @@ canvas { display: block; }
     .header-stats { gap: 16px; }
     .stat-value { font-size: 16px; }
     #panel-toggle.panel-open { right: 278px; }
+}
+
+/* === MOBILE (iPhone) === */
+@media (max-width: 480px) {
+    /* Header */
+    #header { padding: 10px 12px; }
+    .logo-mark { width: 28px; height: 28px; font-size: 11px; }
+    .logo-area { gap: 8px; }
+    .logo-text h1 { font-size: 13px; }
+    .logo-text p { font-size: 9px; }
+    .header-stats { gap: 8px; }
+    .stat-value { font-size: 13px; }
+    .stat-label { font-size: 8px; letter-spacing: 1px; }
+    .data-source-value { font-size: 11px; }
+
+    /* Side panel */
+    #side-panel {
+        width: calc(100vw - 16px); right: 8px; left: 8px;
+        top: auto; bottom: 0; max-height: 55vh;
+        border-radius: 14px 14px 0 0;
+    }
+    #side-panel.collapsed { transform: translateY(100%); }
+    #panel-toggle {
+        right: 12px; top: auto; bottom: 62px;
+        transform: none;
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        font-size: 12px;
+    }
+    #panel-toggle.panel-open { right: 12px; bottom: calc(55vh + 8px); }
+
+    /* Detail panel */
+    #detail-panel {
+        width: calc(100vw - 16px); left: 8px; right: 8px;
+        top: auto; bottom: 0; max-height: 50vh;
+        border-radius: 14px 14px 0 0;
+        overflow-y: auto;
+    }
+    #detail-panel.hidden { transform: translateY(100%); }
+    .detail-body { padding: 12px 14px; }
+    .detail-header { padding: 12px 14px; }
+
+    /* Clock */
+    #clock {
+        bottom: 8px; padding: 8px 12px; gap: 10px;
+        border-radius: 10px;
+    }
+    .clock-time { font-size: 12px; }
+    .clock-label { font-size: 8px; }
+    .speed-slider { width: 60px; }
+    .speed-label { font-size: 10px; min-width: 32px; }
+
+    /* Bottom actions */
+    #bottom-actions { bottom: 52px; gap: 6px; }
+    .bottom-action-btn {
+        padding: 6px 12px; font-size: 10px;
+        border-radius: 8px;
+    }
+
+    /* Toggle controls */
+    #gs-controls { bottom: 52px; left: 8px; gap: 4px; }
+    .gs-toggle-btn {
+        padding: 6px 10px; font-size: 10px; gap: 6px;
+        border-radius: 8px;
+    }
+    .gs-toggle-icon { width: 12px; height: 12px; }
+    #frame-toggle .frame-opt {
+        padding: 4px 8px; font-size: 9px;
+    }
+
+    /* Ground station labels */
+    .gs-label-ttc, .gs-label-gw { font-size: 9px; padding: 2px 6px; }
+    .gs-sublabel { font-size: 7px; }
+
+    /* Tooltip */
+    #tooltip { font-size: 11px; padding: 6px 10px; }
+
+    /* Modals */
+    .source-modal, .datetime-modal { width: calc(100vw - 32px); }
+
+    /* Safe area for notch/home indicator */
+    #clock { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+    #side-panel { padding-bottom: env(safe-area-inset-bottom); }
+    #detail-panel { padding-bottom: env(safe-area-inset-bottom); }
 }
 </style>
 </head>
