@@ -2388,6 +2388,7 @@ function updateSatellitePositions() {
             if (posVel.velocity) {
                 const v = posVel.velocity;
                 sat.speed = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+                sat.eciVx = v.x; sat.eciVy = v.y; sat.eciVz = v.z;
             }
 
             // Store previous world position for velocity direction (tracking arrow)
@@ -3184,19 +3185,50 @@ function showEccentricityViz(satIndex) {
     }
     hideOrbitOverlays();
     const sat = satellites[satIndex];
-    const ecc = sat.eccentricity;
-    const incRad = sat.satrec.inclo;
-    const raanRad = sat.satrec.nodeo;
-    const argpRad = sat.satrec.argpo;
     vizGmst = 0;
 
-    // Semi-major axis from mean motion
-    const mu = 398600.4418; // km^3/s^2
-    const n = sat.satrec.no / 60; // rad/s (satrec.no is rad/min)
-    const a_km = Math.pow(mu / (n * n), 1 / 3);
-    const a = a_km * SAT_SCALE; // scene units (semi-major axis)
-    const b = a * Math.sqrt(1 - ecc * ecc); // semi-minor axis
-    const c = a * ecc; // center-to-focus distance
+    // Compute osculating orbital elements from current ECI state vector
+    // This gives the true instantaneous orbit (matches SGP4 propagated altitude)
+    const mu_km = 398600.4418; // km^3/s^2
+    const rx = sat.eciX, ry = sat.eciY, rz = sat.eciZ;
+    const vx = sat.eciVx, vy = sat.eciVy, vz = sat.eciVz;
+    const rMag = Math.sqrt(rx*rx + ry*ry + rz*rz);
+    const vMag = Math.sqrt(vx*vx + vy*vy + vz*vz);
+
+    // Specific angular momentum h = r × v
+    const hx = ry*vz - rz*vy, hy = rz*vx - rx*vz, hz = rx*vy - ry*vx;
+    const hMag = Math.sqrt(hx*hx + hy*hy + hz*hz);
+
+    // Eccentricity vector e = (v × h)/mu - r/|r|
+    const vxh_x = vy*hz - vz*hy, vxh_y = vz*hx - vx*hz, vxh_z = vx*hy - vy*hx;
+    const ex = vxh_x/mu_km - rx/rMag, ey = vxh_y/mu_km - ry/rMag, ez = vxh_z/mu_km - rz/rMag;
+    const ecc = Math.sqrt(ex*ex + ey*ey + ez*ez);
+
+    // Semi-major axis from vis-viva: 1/a = 2/r - v²/mu
+    const a_km = 1 / (2/rMag - vMag*vMag/mu_km);
+    const a = a_km * SAT_SCALE;
+
+    // Inclination from h
+    const incRad = Math.acos(Math.max(-1, Math.min(1, hz / hMag)));
+
+    // Node vector n = z × h (points to ascending node)
+    const nnx = -hy, nny = hx; // nz = 0
+    const nMag = Math.sqrt(nnx*nnx + nny*nny);
+
+    // RAAN
+    let raanRad = 0;
+    if (nMag > 1e-10) {
+        raanRad = Math.acos(Math.max(-1, Math.min(1, nnx / nMag)));
+        if (nny < 0) raanRad = 2*Math.PI - raanRad;
+    }
+
+    // Argument of perigee
+    let argpRad = 0;
+    if (nMag > 1e-10 && ecc > 1e-10) {
+        const ndote = (nnx*ex + nny*ey) / (nMag * ecc);
+        argpRad = Math.acos(Math.max(-1, Math.min(1, ndote)));
+        if (ez < 0) argpRad = 2*Math.PI - argpRad;
+    }
 
     // Ascending node direction in scene
     const anScene = eciToScene(Math.cos(raanRad), Math.sin(raanRad), 0, vizGmst).normalize();
@@ -3578,26 +3610,64 @@ function updateDetailPanel() {
     $detailLon.textContent = sat.lon.toFixed(3) + '\u00B0';
     $detailAlt.textContent = Math.round(sat.alt).toLocaleString() + ' km';
     $detailVel.textContent = (sat.speed || 0).toFixed(1) + ' km/s';
-    $detailInc.textContent = sat.inclination.toFixed(2) + '\u00B0';
-    $detailEcc.textContent = sat.eccentricity.toFixed(6);
-    $detailPeriod.textContent = sat.period.toFixed(1) + ' min';
+    // Osculating orbital elements from state vector (matches SGP4 propagated orbit)
+    if (sat.eciX !== undefined && sat.eciVx !== undefined) {
+        const _mu = 398600.4418;
+        const _rx = sat.eciX, _ry = sat.eciY, _rz = sat.eciZ;
+        const _vx = sat.eciVx, _vy = sat.eciVy, _vz = sat.eciVz;
+        const _rM = Math.sqrt(_rx*_rx + _ry*_ry + _rz*_rz);
+        const _vM = Math.sqrt(_vx*_vx + _vy*_vy + _vz*_vz);
+
+        // Angular momentum h = r × v
+        const _hx = _ry*_vz - _rz*_vy, _hy = _rz*_vx - _rx*_vz, _hz = _rx*_vy - _ry*_vx;
+        const _hM = Math.sqrt(_hx*_hx + _hy*_hy + _hz*_hz);
+
+        // Eccentricity vector
+        const _vxh_x = _vy*_hz - _vz*_hy, _vxh_y = _vz*_hx - _vx*_hz, _vxh_z = _vx*_hy - _vy*_hx;
+        const _ex = _vxh_x/_mu - _rx/_rM, _ey = _vxh_y/_mu - _ry/_rM, _ez = _vxh_z/_mu - _rz/_rM;
+        const oscEcc = Math.sqrt(_ex*_ex + _ey*_ey + _ez*_ez);
+
+        // Inclination
+        const oscInc = Math.acos(Math.max(-1, Math.min(1, _hz / _hM))) * RAD2DEG;
+
+        // Semi-major axis (vis-viva)
+        const oscA = 1 / (2/_rM - _vM*_vM/_mu);
+
+        // Period
+        const oscPeriod = 2 * Math.PI * Math.sqrt(oscA*oscA*oscA / _mu) / 60; // minutes
+
+        // Node vector n = z × h
+        const _nnx = -_hy, _nny = _hx;
+        const _nM = Math.sqrt(_nnx*_nnx + _nny*_nny);
+
+        // RAAN
+        let oscRaan = 0;
+        if (_nM > 1e-10) {
+            oscRaan = Math.acos(Math.max(-1, Math.min(1, _nnx / _nM)));
+            if (_nny < 0) oscRaan = 2*Math.PI - oscRaan;
+        }
+
+        // Argument of latitude (angle from ascending node to satellite in orbital plane)
+        const nx = Math.cos(oscRaan), ny = Math.sin(oscRaan);
+        const px = _rx * nx + _ry * ny;
+        const py = (-_rx * ny + _ry * nx) * Math.cos(oscInc * DEG2RAD) + _rz * Math.sin(oscInc * DEG2RAD);
+        const aol = ((Math.atan2(py, px) * RAD2DEG) % 360 + 360) % 360;
+
+        $detailInc.textContent = oscInc.toFixed(2) + '\u00B0';
+        $detailEcc.textContent = oscEcc.toFixed(6);
+        $detailRaan.textContent = (oscRaan * RAD2DEG).toFixed(2) + '\u00B0';
+        $detailAol.textContent = aol.toFixed(2) + '\u00B0';
+        $detailPeriod.textContent = oscPeriod.toFixed(1) + ' min';
+    } else {
+        $detailInc.textContent = sat.inclination.toFixed(2) + '\u00B0';
+        $detailEcc.textContent = sat.eccentricity.toFixed(6);
+        const raan = (sat.satrec.nodeo * RAD2DEG % 360 + 360) % 360;
+        $detailRaan.textContent = raan.toFixed(2) + '\u00B0';
+        $detailAol.textContent = '--';
+        $detailPeriod.textContent = sat.period.toFixed(1) + ' min';
+    }
     $detailNorad.textContent = sat.noradId;
     $detailPlane.textContent = sat.plane > 0 ? 'Plane ' + sat.plane : 'Unassigned';
-
-    // RAAN from satrec (epoch value)
-    const raan = (sat.satrec.nodeo * RAD2DEG % 360 + 360) % 360;
-    $detailRaan.textContent = raan.toFixed(2) + '\u00B0';
-
-    // Argument of Latitude — use cached ECI from updateSatellitePositions (no re-propagation)
-    if (sat.eciX !== undefined) {
-        const raanRad = sat.satrec.nodeo;
-        const incRad = sat.satrec.inclo;
-        const nx = Math.cos(raanRad), ny = Math.sin(raanRad);
-        const px = sat.eciX * nx + sat.eciY * ny;
-        const py = (-sat.eciX * ny + sat.eciY * nx) * Math.cos(incRad) + sat.eciZ * Math.sin(incRad);
-        const aol = ((Math.atan2(py, px) * RAD2DEG) % 360 + 360) % 360;
-        $detailAol.textContent = aol.toFixed(2) + '\u00B0';
-    }
 }
 
 function updateStats() {
