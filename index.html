@@ -924,9 +924,59 @@ canvas { display: block; }
     /* Rotate buttons: hide when not needed to save space */
     .rotate-btn { padding: 10px 12px; min-height: 38px; }
 }
+
+/* === PORTRAIT WARNING (mobile only) === */
+#portrait-warning {
+    display: none;
+    position: fixed; inset: 0; z-index: 2000;
+    background: var(--bg-primary);
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 20px;
+    text-align: center;
+    padding: 32px;
+}
+.portrait-icon {
+    width: 56px; height: 56px;
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    position: relative;
+    animation: rotate-hint 2s ease-in-out infinite;
+}
+.portrait-icon::after {
+    content: '';
+    position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+    width: 12px; height: 2px;
+    background: var(--accent); border-radius: 1px;
+}
+@keyframes rotate-hint {
+    0%, 30% { transform: rotate(0deg); }
+    50%, 80% { transform: rotate(90deg); }
+    100% { transform: rotate(0deg); }
+}
+.portrait-title {
+    font-size: 18px; font-weight: 600;
+    color: var(--text-primary);
+}
+.portrait-subtitle {
+    font-size: 13px; color: var(--text-secondary);
+    font-family: var(--font-mono);
+    line-height: 1.6;
+}
+
+@media (max-width: 480px) and (orientation: portrait) {
+    #portrait-warning { display: flex; }
+}
 </style>
 </head>
 <body>
+
+<!-- Portrait Warning -->
+<div id="portrait-warning">
+    <div class="portrait-icon"></div>
+    <div class="portrait-title">Rotate Your Device</div>
+    <div class="portrait-subtitle">This tracker is best experienced<br>in landscape orientation</div>
+</div>
 
 <!-- Loading Screen -->
 <div id="loading-screen">
