@@ -3320,9 +3320,17 @@ function showEccentricityViz(satIndex) {
     addVizTag('APOGEE', apogeePos.clone().addScaledVector(apogeeDir, 0.5), '#ff6b35');
     addVizTag('EARTH (FOCUS)', new THREE.Vector3(0, -0.6, 0), '#00e5ff');
 
-    // For OneWeb (near-circular), add note about how close perigee/apogee are
-    const periKm = a_km * (1 - ecc) - 6371;
-    const apoKm = a_km * (1 + ecc) - 6371;
+    // Compute geodetic altitudes at perigee and apogee (matches live altitude readout)
+    const rPerigee_km = a_km * (1 - ecc);
+    const rApogee_km = a_km * (1 + ecc);
+    const eHat = ecc > 1e-10 ? { x: ex/ecc, y: ey/ecc, z: ez/ecc } : { x: 1, y: 0, z: 0 };
+    const periEci = { x: eHat.x * rPerigee_km, y: eHat.y * rPerigee_km, z: eHat.z * rPerigee_km };
+    const apoEci = { x: -eHat.x * rApogee_km, y: -eHat.y * rApogee_km, z: -eHat.z * rApogee_km };
+    const gmstNow = satellite.gstime(simTime);
+    const periGeo = satellite.eciToGeodetic(periEci, gmstNow);
+    const apoGeo = satellite.eciToGeodetic(apoEci, gmstNow);
+    const periKm = periGeo.height;
+    const apoKm = apoGeo.height;
     addVizTag(Math.round(periKm) + ' km', perigeePos.clone().addScaledVector(perigeeDir, -0.8), '#6a7b90');
     addVizTag(Math.round(apoKm) + ' km', apogeePos.clone().addScaledVector(apogeeDir, -0.8), '#6a7b90');
 
