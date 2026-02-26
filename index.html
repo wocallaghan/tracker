@@ -967,6 +967,123 @@ canvas { display: block; }
 @media (max-width: 480px) and (orientation: portrait) {
     #portrait-warning { display: flex; }
 }
+
+/* === MOBILE LANDSCAPE === */
+@media (max-height: 440px) and (orientation: landscape) {
+    /* Header: compact single row, hide subtitle */
+    #header { padding: 6px 12px; }
+    .logo-mark { width: 24px; height: 24px; font-size: 10px; }
+    .logo-area { gap: 6px; }
+    .logo-text h1 { font-size: 11px; }
+    .logo-text p { display: none; }
+    .header-stats { gap: 6px; }
+    .stat-value { font-size: 11px; }
+    .stat-label { font-size: 7px; letter-spacing: 0.6px; }
+    .data-source-value { font-size: 9px; }
+    .source-stat-item { padding: 3px 5px; margin: -3px -5px; }
+
+    /* Side panel: right-side vertical panel */
+    #side-panel {
+        width: 220px; right: 0; left: auto;
+        top: 38px; bottom: 0; max-height: none;
+        border-radius: 0;
+        padding-bottom: 0;
+    }
+    #side-panel.collapsed { transform: translateX(100%); }
+    .panel-header { padding: 8px 10px; }
+    .search-box input { padding: 8px 8px 8px 30px; font-size: 13px; }
+    #sat-list { max-height: calc(100vh - 140px); }
+
+    /* Panel toggle: right edge, small circular */
+    #panel-toggle {
+        right: 4px; top: 50%;
+        transform: translateY(-50%);
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        font-size: 10px;
+        bottom: auto;
+    }
+    #panel-toggle.panel-open {
+        right: 224px;
+        bottom: auto;
+    }
+
+    /* Detail panel: left-side vertical panel */
+    #detail-panel {
+        width: 220px; left: 0; right: auto;
+        top: 38px; bottom: 0; max-height: none;
+        border-radius: 0;
+        overflow-y: auto;
+        z-index: 12;
+        padding-bottom: 0;
+    }
+    #detail-panel.hidden { transform: translateX(-100%); }
+    .detail-body { padding: 8px 10px; }
+    .detail-header { padding: 8px 10px; }
+    .detail-close { width: 36px; height: 36px; font-size: 16px; }
+    .detail-title { font-size: 13px; }
+    .detail-subtitle { font-size: 10px; }
+    .detail-grid { gap: 4px; }
+    .detail-grid dt { font-size: 9px; }
+    .detail-grid dd { font-size: 11px; }
+    #detail-track { padding: 6px 10px; font-size: 10px; min-height: 30px; }
+
+    /* Clock: slim bar at bottom */
+    #clock {
+        bottom: 0;
+        padding: 4px 12px;
+        gap: 8px;
+        border-radius: 8px 8px 0 0;
+        left: 50%; transform: translateX(-50%);
+        width: auto;
+    }
+    .clock-time { font-size: 11px; }
+    .clock-label { font-size: 7px; margin-top: 1px; }
+    .speed-slider { width: 60px; height: 16px; }
+    .speed-label { font-size: 9px; min-width: 28px; }
+
+    /* Bottom actions: compact, above clock */
+    #bottom-actions {
+        bottom: 32px;
+        gap: 4px;
+    }
+    .bottom-action-btn {
+        padding: 6px 10px; font-size: 9px;
+        border-radius: 6px;
+        min-height: 28px;
+    }
+
+    /* Toggle controls: top-left, very compact */
+    #gs-controls {
+        bottom: auto; top: 42px; left: 4px;
+        gap: 2px;
+    }
+    .gs-toggle-btn {
+        padding: 4px 6px; font-size: 9px; gap: 4px;
+        border-radius: 6px;
+        min-height: 26px;
+    }
+    .gs-toggle-icon { width: 10px; height: 10px; }
+    #frame-toggle .frame-opt {
+        padding: 4px 6px; font-size: 8px;
+    }
+
+    /* Rotate buttons: compact */
+    .rotate-btn { padding: 6px 8px; min-height: 28px; font-size: 10px; }
+
+    /* Ground station labels */
+    .gs-label-ttc, .gs-label-gw {
+        font-size: 7px; padding: 1px 4px;
+    }
+
+    /* Tooltip */
+    #tooltip { font-size: 10px; padding: 4px 8px; }
+
+    /* Modals */
+    .source-modal, .datetime-modal {
+        max-height: 90vh; overflow-y: auto;
+    }
+}
 </style>
 </head>
 <body>
@@ -1058,11 +1175,11 @@ canvas { display: block; }
             <div class="detail-grid">
                 <div class="detail-field">
                     <div class="detail-field-label">Latitude</div>
-                    <div class="detail-field-value" id="detail-lat">--</div>
+                    <div class="detail-field-value clickable" id="detail-lat">--</div>
                 </div>
                 <div class="detail-field">
                     <div class="detail-field-label">Longitude</div>
-                    <div class="detail-field-value" id="detail-lon">--</div>
+                    <div class="detail-field-value clickable" id="detail-lon">--</div>
                 </div>
                 <div class="detail-field">
                     <div class="detail-field-label">Altitude</div>
@@ -1083,7 +1200,7 @@ canvas { display: block; }
                 </div>
                 <div class="detail-field">
                     <div class="detail-field-label">Eccentricity</div>
-                    <div class="detail-field-value" id="detail-ecc">--</div>
+                    <div class="detail-field-value clickable" id="detail-ecc">--</div>
                 </div>
                 <div class="detail-field">
                     <div class="detail-field-label">Period</div>
@@ -1099,7 +1216,7 @@ canvas { display: block; }
                 </div>
                 <div class="detail-field">
                     <div class="detail-field-label">Arg of Latitude</div>
-                    <div class="detail-field-value" id="detail-aol">--</div>
+                    <div class="detail-field-value clickable" id="detail-aol">--</div>
                 </div>
                 <div class="detail-field">
                     <div class="detail-field-label">Plane</div>
@@ -1396,7 +1513,7 @@ let _mouseDirty = false;
 let _lastMouseX = 0, _lastMouseY = 0;
 let _tooltipContent = '';
 let _tooltipX = 0, _tooltipY = 0;
-let orbitalVizMode = null; // null | 'inclination' | 'raan'
+let orbitalVizMode = null; // null | 'inclination' | 'raan' | 'aol' | 'eccentricity' | 'latlon'
 let orbitalVizObjects = [];
 let orbitalVizLabel = null;
 let vizLabelAnchor = null;
@@ -2482,6 +2599,10 @@ function clearOrbitalViz() {
     vizTags = [];
     $detailInc.classList.remove('viz-active');
     $detailRaan.classList.remove('viz-active');
+    $detailAol.classList.remove('viz-active');
+    $detailEcc.classList.remove('viz-active');
+    $detailLat.classList.remove('viz-active');
+    $detailLon.classList.remove('viz-active');
     if (orbitalVizMode) showOrbitOverlays();
     orbitalVizMode = null;
 
@@ -2873,6 +2994,371 @@ function showRaanViz(satIndex) {
     animateCameraToVizView(endLat, endLon, 20);
 }
 
+function showAolViz(satIndex) {
+    clearOrbitalViz();
+    if (satIndex < 0 || satIndex >= satellites.length) return;
+    // Auto-switch to ECI — argument of latitude is defined in inertial frame
+    if (referenceFrame !== 'eci') {
+        _frameBeforeViz = referenceFrame;
+        setReferenceFrame('eci');
+    }
+    hideOrbitOverlays();
+    const sat = satellites[satIndex];
+    const incRad = sat.satrec.inclo;
+    const raanRad = sat.satrec.nodeo;
+    vizGmst = 0;
+    const orbitRadius = EARTH_RADIUS + (sat.alt || 1200) * SAT_SCALE;
+
+    // Compute AoL from cached ECI
+    if (sat.eciX === undefined) return;
+    const nx = Math.cos(raanRad), ny = Math.sin(raanRad);
+    const px = sat.eciX * nx + sat.eciY * ny;
+    const py = (-sat.eciX * ny + sat.eciY * nx) * Math.cos(incRad) + sat.eciZ * Math.sin(incRad);
+    const aolDeg = ((Math.atan2(py, px) * RAD2DEG) % 360 + 360) % 360;
+
+    // Ascending node direction in ECI → scene
+    const anScene = eciToScene(Math.cos(raanRad), Math.sin(raanRad), 0, vizGmst).normalize();
+
+    // Orbital plane normal in ECI → scene
+    const si = Math.sin(incRad), ci = Math.cos(incRad);
+    const sO = Math.sin(raanRad), cO = Math.cos(raanRad);
+    const normalScene = eciToScene(si * sO, -si * cO, ci, vizGmst).normalize();
+
+    // Satellite position in scene (ECI → scene)
+    const satScene = eciToScene(sat.eciX, sat.eciY, sat.eciZ, vizGmst).normalize().multiplyScalar(orbitRadius);
+
+    // Equatorial ring + disc
+    createEquatorialRing(orbitRadius);
+
+    // Orbital ring
+    createOrbitalRing(orbitRadius, normalScene);
+
+    // Line of nodes
+    createLineOfNodes(anScene, orbitRadius);
+
+    // Ascending node point
+    const anPoint = anScene.clone().multiplyScalar(orbitRadius);
+    const markerGeo = new THREE.SphereGeometry(0.18, 16, 16);
+    const markerMat = new THREE.MeshBasicMaterial({ color: 0xff6b35 });
+    const marker = new THREE.Mesh(markerGeo, markerMat);
+    marker.position.copy(anPoint);
+    addVizObject(marker);
+
+    // Satellite position marker (green)
+    const satMarkerGeo = new THREE.SphereGeometry(0.22, 16, 16);
+    const satMarkerMat = new THREE.MeshBasicMaterial({ color: 0x00e676 });
+    const satMarker = new THREE.Mesh(satMarkerGeo, satMarkerMat);
+    satMarker.position.copy(satScene);
+    addVizObject(satMarker);
+
+    // Forward direction at ascending node along orbital plane
+    const orbForward = new THREE.Vector3().crossVectors(normalScene, anScene).normalize();
+
+    // AoL measurement arc from ascending node to satellite position along orbital plane
+    const arcRadius = orbitRadius * 0.85;
+    const arcCenter = new THREE.Vector3(0, 0, 0);
+    const arcPts = makeArcPoints(arcRadius, normalScene, arcCenter, anScene, aolDeg, 64);
+    createBoldArc(arcPts, 0x00e676);
+
+    // Tick marks every 30°
+    createArcTicks(arcRadius, normalScene, arcCenter, anScene, aolDeg, 30);
+
+    // Reference arms
+    // From center to ascending node (orange)
+    const anArmGeo = new THREE.BufferGeometry().setFromPoints([arcCenter.clone(), anPoint.clone()]);
+    const anArmMat = new THREE.LineBasicMaterial({ color: 0xff6b35, transparent: true, opacity: 0.7, depthWrite: false });
+    addVizObject(new THREE.Line(anArmGeo, anArmMat));
+    // From center to satellite (green)
+    const satArmGeo = new THREE.BufferGeometry().setFromPoints([arcCenter.clone(), satScene.clone()]);
+    const satArmMat = new THREE.LineBasicMaterial({ color: 0x00e676, transparent: true, opacity: 0.7, depthWrite: false });
+    addVizObject(new THREE.Line(satArmGeo, satArmMat));
+
+    // Label anchor at arc midpoint
+    const midTheta = (aolDeg / 2) * DEG2RAD;
+    const kCross = new THREE.Vector3().crossVectors(normalScene.clone().normalize(), anScene);
+    const midDir = new THREE.Vector3()
+        .copy(anScene).multiplyScalar(Math.cos(midTheta))
+        .addScaledVector(kCross, Math.sin(midTheta));
+    vizLabelAnchor = midDir.normalize().multiplyScalar(arcRadius * 1.4);
+
+    createVizLabel('ARG OF LATITUDE', aolDeg.toFixed(2) + '\u00B0');
+
+    // Feature labels
+    addVizTag('ASCENDING NODE', anPoint.clone().addScaledVector(anScene, 0.4), '#ff6b35');
+    addVizTag('SATELLITE', satScene.clone().addScaledVector(satScene.clone().normalize(), 0.4), '#00e676');
+    addVizTag('ORBITAL PLANE', anScene.clone().negate().multiplyScalar(orbitRadius * 0.5).addScaledVector(orbForward, orbitRadius * 0.8), '#ff6b35');
+
+    orbitalVizMode = 'aol';
+    $detailAol.classList.add('viz-active');
+
+    // Camera: side-on to orbital plane
+    const viewDir = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), normalScene).normalize();
+    const camDir = camera.position.clone().normalize();
+    if (viewDir.dot(camDir) < 0) viewDir.negate();
+    const endLat = 25 * DEG2RAD;
+    const endLon = Math.atan2(viewDir.z, viewDir.x);
+    animateCameraToVizView(endLat, endLon, 20);
+}
+
+function showEccentricityViz(satIndex) {
+    clearOrbitalViz();
+    if (satIndex < 0 || satIndex >= satellites.length) return;
+    // Auto-switch to ECI
+    if (referenceFrame !== 'eci') {
+        _frameBeforeViz = referenceFrame;
+        setReferenceFrame('eci');
+    }
+    hideOrbitOverlays();
+    const sat = satellites[satIndex];
+    const ecc = sat.eccentricity;
+    const incRad = sat.satrec.inclo;
+    const raanRad = sat.satrec.nodeo;
+    const argpRad = sat.satrec.argpo;
+    vizGmst = 0;
+
+    // Semi-major axis from mean motion
+    const mu = 398600.4418; // km^3/s^2
+    const n = sat.satrec.no / 60; // rad/s (satrec.no is rad/min)
+    const a_km = Math.pow(mu / (n * n), 1 / 3);
+    const a = a_km * SAT_SCALE; // scene units (semi-major axis)
+    const b = a * Math.sqrt(1 - ecc * ecc); // semi-minor axis
+    const c = a * ecc; // center-to-focus distance
+
+    // Ascending node direction in scene
+    const anScene = eciToScene(Math.cos(raanRad), Math.sin(raanRad), 0, vizGmst).normalize();
+
+    // Orbital plane normal in scene
+    const si = Math.sin(incRad), ci = Math.cos(incRad);
+    const sO = Math.sin(raanRad), cO = Math.cos(raanRad);
+    const normalScene = eciToScene(si * sO, -si * cO, ci, vizGmst).normalize();
+
+    // Perigee direction (in orbital plane, rotated by argument of perigee from ascending node)
+    const orbForward = new THREE.Vector3().crossVectors(normalScene, anScene).normalize();
+    const perigeeDir = new THREE.Vector3()
+        .copy(anScene).multiplyScalar(Math.cos(argpRad))
+        .addScaledVector(orbForward, Math.sin(argpRad)).normalize();
+    const apogeeDir = perigeeDir.clone().negate();
+
+    // Draw the elliptical orbit
+    const ellipsePts = [];
+    const segments = 128;
+    for (let i = 0; i <= segments; i++) {
+        const theta = (i / segments) * 2 * Math.PI;
+        // Ellipse in orbital plane: perigeeDir = x-axis, cross(normal, perigeeDir) = y-axis
+        const semiLatusRectum = a * (1 - ecc * ecc);
+        const r = semiLatusRectum / (1 + ecc * Math.cos(theta));
+        const localX = r * Math.cos(theta);
+        const localY = r * Math.sin(theta);
+        const perpDir = new THREE.Vector3().crossVectors(normalScene, perigeeDir).normalize();
+        const pt = new THREE.Vector3()
+            .addScaledVector(perigeeDir, localX)
+            .addScaledVector(perpDir, localY);
+        ellipsePts.push(pt);
+    }
+    const ellipseGeo = new THREE.BufferGeometry().setFromPoints(ellipsePts);
+    const ellipseMat = new THREE.LineBasicMaterial({ color: 0xff6b35, transparent: true, opacity: 0.8, depthWrite: false });
+    addVizObject(new THREE.Line(ellipseGeo, ellipseMat));
+
+    // Earth (center / focus) marker
+    const earthMarkerGeo = new THREE.SphereGeometry(0.15, 16, 16);
+    const earthMarkerMat = new THREE.MeshBasicMaterial({ color: 0x00e5ff });
+    const earthMarker = new THREE.Mesh(earthMarkerGeo, earthMarkerMat);
+    addVizObject(earthMarker);
+
+    // Perigee marker
+    const rPerigee = a * (1 - ecc);
+    const perigeePos = perigeeDir.clone().multiplyScalar(rPerigee);
+    const periGeo = new THREE.SphereGeometry(0.18, 16, 16);
+    const periMat = new THREE.MeshBasicMaterial({ color: 0x00e676 });
+    const periMarker = new THREE.Mesh(periGeo, periMat);
+    periMarker.position.copy(perigeePos);
+    addVizObject(periMarker);
+
+    // Apogee marker
+    const rApogee = a * (1 + ecc);
+    const apogeePos = apogeeDir.clone().multiplyScalar(rApogee);
+    const apoGeo = new THREE.SphereGeometry(0.18, 16, 16);
+    const apoMat = new THREE.MeshBasicMaterial({ color: 0xff6b35 });
+    const apoMarker = new THREE.Mesh(apoGeo, apoMat);
+    apoMarker.position.copy(apogeePos);
+    addVizObject(apoMarker);
+
+    // Semi-major axis line (perigee to apogee through center)
+    const axisGeo = new THREE.BufferGeometry().setFromPoints([perigeePos.clone(), apogeePos.clone()]);
+    const axisMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4, depthWrite: false });
+    addVizObject(new THREE.Line(axisGeo, axisMat));
+
+    // Circular reference orbit (same semi-major axis, dashed feel via segments)
+    const circPts = [];
+    for (let i = 0; i <= 128; i++) {
+        const theta = (i / 128) * 2 * Math.PI;
+        const perpDir = new THREE.Vector3().crossVectors(normalScene, perigeeDir).normalize();
+        const pt = new THREE.Vector3()
+            .addScaledVector(perigeeDir, a * Math.cos(theta))
+            .addScaledVector(perpDir, a * Math.sin(theta));
+        circPts.push(pt);
+    }
+    const circGeo = new THREE.BufferGeometry().setFromPoints(circPts);
+    const circMat = new THREE.LineDashedMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.3, dashSize: 0.3, gapSize: 0.2, depthWrite: false });
+    const circLine = new THREE.Line(circGeo, circMat);
+    circLine.computeLineDistances();
+    addVizObject(circLine);
+
+    // Label
+    const labelPos = perigeeDir.clone().multiplyScalar(rPerigee * 0.5).addScaledVector(normalScene, 1.5);
+    vizLabelAnchor = labelPos;
+    createVizLabel('ECCENTRICITY', ecc.toFixed(6));
+
+    // Feature labels
+    addVizTag('PERIGEE', perigeePos.clone().addScaledVector(perigeeDir, 0.5), '#00e676');
+    addVizTag('APOGEE', apogeePos.clone().addScaledVector(apogeeDir, 0.5), '#ff6b35');
+    addVizTag('EARTH (FOCUS)', new THREE.Vector3(0, -0.6, 0), '#00e5ff');
+
+    // For OneWeb (near-circular), add note about how close perigee/apogee are
+    const periKm = a_km * (1 - ecc) - 6371;
+    const apoKm = a_km * (1 + ecc) - 6371;
+    addVizTag(Math.round(periKm) + ' km', perigeePos.clone().addScaledVector(perigeeDir, -0.8), '#6a7b90');
+    addVizTag(Math.round(apoKm) + ' km', apogeePos.clone().addScaledVector(apogeeDir, -0.8), '#6a7b90');
+
+    orbitalVizMode = 'eccentricity';
+    $detailEcc.classList.add('viz-active');
+
+    // Camera: side-on to orbital plane, slightly elevated
+    const viewDir = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), normalScene).normalize();
+    const camDir = camera.position.clone().normalize();
+    if (viewDir.dot(camDir) < 0) viewDir.negate();
+    const endLat = 20 * DEG2RAD;
+    const endLon = Math.atan2(viewDir.z, viewDir.x);
+    animateCameraToVizView(endLat, endLon, 22);
+}
+
+function showLatLonViz(satIndex) {
+    clearOrbitalViz();
+    if (satIndex < 0 || satIndex >= satellites.length) return;
+    // Lat/lon are in ECEF — switch to ECEF if needed
+    if (referenceFrame !== 'ecef') {
+        _frameBeforeViz = referenceFrame;
+        setReferenceFrame('ecef');
+    }
+    hideOrbitOverlays();
+    const sat = satellites[satIndex];
+    const lat = sat.lat;
+    const lon = sat.lon;
+
+    // Subsatellite point on Earth surface
+    const surfacePos = geoToVec3(lat, lon, 0);
+    const satPos = geoToVec3(lat, lon, sat.alt);
+
+    // Earth equatorial ring
+    const eqRadius = EARTH_RADIUS * 1.005;
+    const eqPts = [];
+    for (let i = 0; i <= 128; i++) {
+        const theta = (i / 128) * 2 * Math.PI;
+        eqPts.push(new THREE.Vector3(eqRadius * Math.cos(theta), 0, eqRadius * Math.sin(theta)));
+    }
+    const eqGeo = new THREE.BufferGeometry().setFromPoints(eqPts);
+    const eqMat = new THREE.LineBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.5, depthWrite: false });
+    addVizObject(new THREE.Line(eqGeo, eqMat));
+
+    // Prime meridian line (0° longitude, from pole to pole on surface)
+    const pmPts = [];
+    for (let i = 0; i <= 64; i++) {
+        const latStep = (i / 64) * Math.PI - Math.PI / 2;
+        const r = EARTH_RADIUS * 1.005;
+        pmPts.push(new THREE.Vector3(r * Math.cos(latStep), r * Math.sin(latStep), 0));
+    }
+    const pmGeo = new THREE.BufferGeometry().setFromPoints(pmPts);
+    const pmMat = new THREE.LineBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.3, depthWrite: false });
+    addVizObject(new THREE.Line(pmGeo, pmMat));
+
+    // Longitude meridian at satellite's longitude
+    const lonRad = -lon * DEG2RAD;
+    const merPts = [];
+    for (let i = 0; i <= 64; i++) {
+        const latStep = (i / 64) * Math.PI - Math.PI / 2;
+        const r = EARTH_RADIUS * 1.005;
+        merPts.push(new THREE.Vector3(
+            r * Math.cos(latStep) * Math.cos(lonRad),
+            r * Math.sin(latStep),
+            r * Math.cos(latStep) * Math.sin(lonRad)
+        ));
+    }
+    const merGeo = new THREE.BufferGeometry().setFromPoints(merPts);
+    const merMat = new THREE.LineBasicMaterial({ color: 0xff6b35, transparent: true, opacity: 0.5, depthWrite: false });
+    addVizObject(new THREE.Line(merGeo, merMat));
+
+    // Longitude arc on equator from prime meridian to satellite longitude
+    const absLon = ((lon % 360) + 360) % 360;
+    const lonArc = lon >= 0 ? lon : lon + 360; // always positive sweep
+    const arcRadius = EARTH_RADIUS * 1.12;
+    const eqUp = new THREE.Vector3(0, 1, 0);
+    const pmDir = new THREE.Vector3(1, 0, 0); // prime meridian = 0° lon
+    const lonArcPts = makeArcPoints(arcRadius, eqUp, new THREE.Vector3(0, 0, 0), pmDir, lonArc, 64);
+    createBoldArc(lonArcPts, 0xff6b35);
+    createArcTicks(arcRadius, eqUp, new THREE.Vector3(0, 0, 0), pmDir, lonArc, 30);
+
+    // Latitude arc along the satellite's meridian from equator to satellite
+    const latArcRadius = EARTH_RADIUS * 1.08;
+    // The equator point on this meridian
+    const eqPoint = new THREE.Vector3(
+        latArcRadius * Math.cos(lonRad),
+        0,
+        latArcRadius * Math.sin(lonRad)
+    );
+    const merDir = eqPoint.clone().normalize(); // direction along equator at this lon
+    // Axis for latitude arc: tangent to equator at this longitude (points east)
+    const latAxis = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), merDir).normalize().negate();
+    const latArcPts = makeArcPoints(latArcRadius, latAxis, new THREE.Vector3(0, 0, 0), merDir, Math.abs(lat), 48);
+    // If latitude is negative (south), we need to flip
+    if (lat < 0) {
+        // Reflect arc points below equator
+        for (const pt of latArcPts) pt.y = -pt.y;
+    }
+    createBoldArc(latArcPts, 0x00e676);
+    createArcTicks(latArcRadius, lat >= 0 ? latAxis : latAxis.clone().negate(), new THREE.Vector3(0, 0, 0), merDir, Math.abs(lat), 10);
+
+    // Subsatellite point marker (on surface)
+    const ssGeo = new THREE.SphereGeometry(0.15, 16, 16);
+    const ssMat = new THREE.MeshBasicMaterial({ color: 0x00e676 });
+    const ssMarker = new THREE.Mesh(ssGeo, ssMat);
+    ssMarker.position.copy(surfacePos);
+    addVizObject(ssMarker);
+
+    // Line from surface to satellite
+    const dropGeo = new THREE.BufferGeometry().setFromPoints([surfacePos.clone(), satPos.clone()]);
+    const dropMat = new THREE.LineDashedMaterial({ color: 0x00e676, transparent: true, opacity: 0.5, dashSize: 0.2, gapSize: 0.15, depthWrite: false });
+    const dropLine = new THREE.Line(dropGeo, dropMat);
+    dropLine.computeLineDistances();
+    addVizObject(dropLine);
+
+    // Longitude label
+    const lonMid = (lonArc / 2) * DEG2RAD;
+    const lonLabelDir = new THREE.Vector3(Math.cos(-lonMid), 0, Math.sin(-lonMid));
+    vizLabelAnchor = lonLabelDir.multiplyScalar(arcRadius * 1.3);
+    vizLabelAnchor.y += 0.3;
+    const lonStr = Math.abs(lon).toFixed(3) + '\u00B0' + (lon >= 0 ? 'E' : 'W');
+    const latStr = Math.abs(lat).toFixed(3) + '\u00B0' + (lat >= 0 ? 'N' : 'S');
+    createVizLabel('LAT / LON', latStr + '  ' + lonStr);
+
+    // Feature labels
+    addVizTag('PRIME MERIDIAN', new THREE.Vector3(EARTH_RADIUS * 1.08, 0.5, 0), '#00e5ff');
+    addVizTag('EQUATOR', new THREE.Vector3(-EARTH_RADIUS * 0.8, 0.3, EARTH_RADIUS * 0.7), '#00e5ff');
+    addVizTag('SUB-SATELLITE', surfacePos.clone().addScaledVector(surfacePos.clone().normalize(), 0.4), '#00e676');
+    const lonDirTag = new THREE.Vector3(Math.cos(lonRad), 0, Math.sin(lonRad)).multiplyScalar(EARTH_RADIUS * 1.2);
+    lonDirTag.y = -0.3;
+    addVizTag(lon.toFixed(1) + '\u00B0 MERIDIAN', lonDirTag, '#ff6b35');
+
+    orbitalVizMode = 'latlon';
+    $detailLat.classList.add('viz-active');
+    $detailLon.classList.add('viz-active');
+
+    // Camera: look at subsatellite point from slightly elevated angle
+    const surfaceDir = surfacePos.clone().normalize();
+    const endLat = (lat * DEG2RAD) * 0.5 + 20 * DEG2RAD * Math.sign(lat || 1);
+    const endLon = Math.atan2(surfaceDir.z, surfaceDir.x);
+    animateCameraToVizView(endLat, endLon, 18);
+}
+
 // ============================================================
 // TRACKING HALO
 // ============================================================
@@ -3081,11 +3567,16 @@ function selectSatellite(index) {
     }
 
     if (index === selectedIndex) {
-        // Toggle off — stop tracking but keep camera where it is
-        stopTracking();
-        selectedIndex = -1;
-        $detailPanel.classList.add('hidden');
-        clearOrbitPath();
+        if ($detailPanel.classList.contains('hidden')) {
+            // Detail panel was dismissed — re-show it
+            $detailPanel.classList.remove('hidden');
+        } else {
+            // Toggle off — stop tracking but keep camera where it is
+            stopTracking();
+            selectedIndex = -1;
+            $detailPanel.classList.add('hidden');
+            clearOrbitPath();
+        }
         return;
     }
 
@@ -3712,7 +4203,7 @@ $panelToggle.addEventListener('click', () => {
 // DETAIL CLOSE
 // ============================================================
 document.getElementById('detail-close').addEventListener('click', () => {
-    if (selectedIndex >= 0) selectSatellite(selectedIndex); // toggle off
+    $detailPanel.classList.add('hidden');
 });
 
 document.getElementById('detail-track').addEventListener('click', () => {
@@ -4305,6 +4796,42 @@ $detailRaan.addEventListener('click', () => {
         clearOrbitalViz();
     } else {
         showRaanViz(selectedIndex);
+    }
+});
+
+$detailAol.addEventListener('click', () => {
+    if (selectedIndex < 0) return;
+    if (orbitalVizMode === 'aol') {
+        clearOrbitalViz();
+    } else {
+        showAolViz(selectedIndex);
+    }
+});
+
+$detailEcc.addEventListener('click', () => {
+    if (selectedIndex < 0) return;
+    if (orbitalVizMode === 'eccentricity') {
+        clearOrbitalViz();
+    } else {
+        showEccentricityViz(selectedIndex);
+    }
+});
+
+$detailLat.addEventListener('click', () => {
+    if (selectedIndex < 0) return;
+    if (orbitalVizMode === 'latlon') {
+        clearOrbitalViz();
+    } else {
+        showLatLonViz(selectedIndex);
+    }
+});
+
+$detailLon.addEventListener('click', () => {
+    if (selectedIndex < 0) return;
+    if (orbitalVizMode === 'latlon') {
+        clearOrbitalViz();
+    } else {
+        showLatLonViz(selectedIndex);
     }
 });
 
