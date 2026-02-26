@@ -1,5 +1,58 @@
 # OneWeb Constellation Tracker — Changelog
 
+## v10 — Excluded Satellite Styling, Plane Selection & UX Polish (2026-02-26)
+**Backup:** `index_v10_exclusions.html`
+
+### Added
+- **Excluded satellite red styling**: The 3 hardcoded exclusions (0013, 0050, 0618) now render as red dots instead of blue, with red hover colour and red tracking halo when selected.
+- **Neutral point texture**: Satellite point cloud texture changed from cyan-tinted to white/neutral gradient so vertex colours control hue entirely (enables red excluded sats).
+- **Hover expand sprite**: Hovering over a satellite shows a larger glowing sprite at its position for better visibility. Skipped when the satellite is already selected.
+- **Unassigned satellite search**: Typing "unassigned" in the search box shows a red-dotted "Unassigned" group item plus all plane 0 satellites. Clicking it highlights them with glow (no disc or camera pan since they're not in a coherent plane).
+- **Plane selection from detail panel**: Clicking the Plane field in the satellite info box selects that plane.
+- **Plane disc overlay**: Semi-transparent cyan disc rendered in the orbital plane when a plane is selected (6% opacity).
+
+### Changed
+- **Satellite list sort order**: Satellites now sorted by OneWeb number (extracted from name) instead of NORAD ID.
+- **Eccentricity info popup**: Moved from inline in the detail panel to a separate floating popup window.
+- **Camera minimum distance**: `controls.minDistance` set to `EARTH_RADIUS + 0.5` to prevent camera going inside Earth.
+- **Follow camera distance preservation**: Re-normalises camera position after lerp to prevent zooming in at high speeds.
+- **AoL camera angle**: Now matches the inclination camera's tilted perspective exactly.
+- **Plane camera**: Uses inclination-style tilt, picks whichever side is closer to current camera, always looks slightly down.
+- **RAAN camera**: Views from 89° latitude (nearly directly above) instead of 75°.
+- **Orbital viz toggle**: No more view jolt when rapidly toggling on/off — `cameraAnim` cancelled on clear, frame restore skipped during immediate re-open.
+- **`clearOrbitalViz()` called on plane select**: Any active orbital visualisation is cleared when selecting a plane.
+
+### Fixed
+- **Inclination camera side**: Always positions toward the arc's concave side (vizLabelAnchor direction) instead of sometimes flipping to the wrong side.
+- **`anPoint` redeclaration**: Fixed duplicate `const anPoint` in `showAolViz` that caused SyntaxError.
+
+---
+
+## v9 — Orbital Visualisations, Osculating Elements & Accuracy Fixes (2026-02-26)
+**Backup:** `index_v9_vizfields.html`
+
+### Added
+- **Argument of Latitude (AoL) visualisation**: Clickable field in detail panel opens live-updating 3D arc from ascending node to satellite position in the orbital plane. Label follows satellite in real time.
+- **Eccentricity visualisation**: Clickable field shows elliptical orbit with min/max altitude markers, circular reference orbit, and Earth focus point. Markers placed using SGP4 + WGS84 geodetic sampling (360 points) so they match the live altitude readout exactly.
+- **Live-updating eccentricity labels**: Min/max altitude tags re-sample the orbit every 0.5s to stay in sync with the evolving osculating orbit.
+- **Mobile landscape CSS**: `@media (max-height: 440px) and (orientation: landscape)` with 220px side panels, compact header, slim clock bar.
+- **Dismissible detail panel**: Close button hides the panel without deselecting the satellite — orbit path and tracking persist. Re-clicking the same satellite re-shows the panel.
+- **Selected satellite real-time propagation**: At 1x speed, the selected satellite is propagated every frame (not every 4th) for monitoring-grade accuracy.
+
+### Changed
+- **All orbital readouts use osculating elements**: Inclination, eccentricity, RAAN, AoL, and period are computed from the ECI state vector (position + velocity) each frame, matching the SGP4-propagated orbit exactly.
+- **Perigee/apogee markers**: Placed at true min/max geodetic altitude positions (accounting for WGS84 oblateness), not Keplerian perigee/apogee. Labels read "MIN ALT" / "MAX ALT".
+- **Detail panel field order**: RAAN and AoL moved above Period and NORAD ID.
+- **Altitude field**: Removed blue accent colour.
+- **dt capped at 0.1s**: Prevents massive time jumps when returning from a background tab.
+
+### Fixed
+- **`periGeo` redeclaration**: Variable name collision between Three.js SphereGeometry and geodetic conversion caused a SyntaxError preventing the app from loading.
+- **Inclination camera angle**: Now views the inclination arc head-on (was 90° off).
+- **ECI frame guard**: Toggling away from ECI auto-closes inclination/RAAN/AoL visualisations that require the inertial frame.
+
+---
+
 ## v8 — South Atlantic Anomaly Overlay & Pan Controls (2026-02-26)
 **Backup:** `index_v8_saa.html`
 

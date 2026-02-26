@@ -2358,30 +2358,28 @@ function showPlaneGlow(planeNum) {
     planeGlowCloud = new THREE.Points(planeGlowGeo, mat);
     scene.add(planeGlowCloud);
 
-    // Semi-transparent orbital plane disc (skip for unassigned plane 0 — not a coherent plane)
-    if (planeNum !== 0) {
-        const normal = new THREE.Vector3(0, 0, 0);
-        const quarter = Math.max(1, Math.floor(count / 4));
-        for (let j = 0; j < count; j++) {
-            const k = (j + quarter) % count;
-            const a = new THREE.Vector3(positions[j*3], positions[j*3+1], positions[j*3+2]);
-            const b = new THREE.Vector3(positions[k*3], positions[k*3+1], positions[k*3+2]);
-            normal.add(new THREE.Vector3().crossVectors(a, b));
-        }
-        normal.normalize();
-        const avgDist = positions.length > 0
-            ? Math.sqrt(positions[0]**2 + positions[1]**2 + positions[2]**2)
-            : EARTH_RADIUS + 1;
-        const discGeo = new THREE.CircleGeometry(avgDist * 1.15, 64);
-        const discMat = new THREE.MeshBasicMaterial({
-            color: 0x44bbff, transparent: true, opacity: 0.06,
-            side: THREE.DoubleSide, depthWrite: false,
-        });
-        planeDiscMesh = new THREE.Mesh(discGeo, discMat);
-        const up = new THREE.Vector3(0, 0, 1);
-        planeDiscMesh.quaternion.setFromUnitVectors(up, normal);
-        scene.add(planeDiscMesh);
+    // Semi-transparent orbital plane disc
+    const normal = new THREE.Vector3(0, 0, 0);
+    const quarter = Math.max(1, Math.floor(count / 4));
+    for (let j = 0; j < count; j++) {
+        const k = (j + quarter) % count;
+        const a = new THREE.Vector3(positions[j*3], positions[j*3+1], positions[j*3+2]);
+        const b = new THREE.Vector3(positions[k*3], positions[k*3+1], positions[k*3+2]);
+        normal.add(new THREE.Vector3().crossVectors(a, b));
     }
+    normal.normalize();
+    const avgDist = positions.length > 0
+        ? Math.sqrt(positions[0]**2 + positions[1]**2 + positions[2]**2)
+        : EARTH_RADIUS + 1;
+    const discGeo = new THREE.CircleGeometry(avgDist * 1.15, 64);
+    const discMat = new THREE.MeshBasicMaterial({
+        color: 0x44bbff, transparent: true, opacity: 0.06,
+        side: THREE.DoubleSide, depthWrite: false,
+    });
+    planeDiscMesh = new THREE.Mesh(discGeo, discMat);
+    const up = new THREE.Vector3(0, 0, 1);
+    planeDiscMesh.quaternion.setFromUnitVectors(up, normal);
+    scene.add(planeDiscMesh);
 }
 
 function removePlaneGlow() {
@@ -3526,22 +3524,6 @@ function buildSatList() {
     }
 
     // Insert plane group items (hidden by default, shown during search)
-    // Count unassigned (plane 0) satellites
-    const unassignedCount = satellites.filter(s => s.plane === 0).length;
-    if (unassignedCount > 0) {
-        const div = document.createElement('div');
-        div.className = 'plane-item';
-        div.dataset.plane = '0';
-        div.innerHTML = `
-            <div class="plane-dot" style="background:#ff5252"></div>
-            <div class="sat-info">
-                <div class="sat-name">Unassigned</div>
-                <div class="sat-meta">${unassignedCount} satellites</div>
-            </div>
-        `;
-        div.addEventListener('click', () => selectPlane(0));
-        frag.appendChild(div);
-    }
     for (let p = 1; p <= 12; p++) {
         if (!planeCounts[p]) continue;
         const div = document.createElement('div');
@@ -3584,14 +3566,11 @@ function filterSatList(query) {
     const satItems = $satList.querySelectorAll('.sat-item');
     const planeExact = q.match(/^plane\s*(\d+)$/i);
     const planePartial = ql && ('plane'.startsWith(ql) || ql.startsWith('plane'));
-    const unassignedMatch = ql && 'unassigned'.startsWith(ql);
 
     // Show/hide plane group items
     planeItems.forEach(item => {
         const p = parseInt(item.dataset.plane, 10);
-        if (unassignedMatch) {
-            item.style.display = p === 0 ? 'flex' : 'none';
-        } else if (planeExact) {
+        if (planeExact) {
             item.style.display = p === parseInt(planeExact[1], 10) ? 'flex' : 'none';
         } else if (planePartial) {
             item.style.display = 'flex';
@@ -3603,12 +3582,7 @@ function filterSatList(query) {
     });
 
     // Show/hide satellite items
-    if (unassignedMatch) {
-        satItems.forEach(item => {
-            const i = parseInt(item.dataset.index, 10);
-            item.style.display = satellites[i].plane === 0 ? '' : 'none';
-        });
-    } else if (planeExact) {
+    if (planeExact) {
         const planeNum = parseInt(planeExact[1], 10);
         satItems.forEach(item => {
             const i = parseInt(item.dataset.index, 10);
@@ -4057,8 +4031,8 @@ function selectPlane(planeNum) {
     // Add big blue glow overlay
     showPlaneGlow(planeNum);
 
-    // Pan camera to edge-on view of the plane (skip for unassigned — not a coherent plane)
-    if (planeNum !== 0) panToPlane(planeNum);
+    // Pan camera to edge-on view of the plane
+    panToPlane(planeNum);
 
     // Show rotate buttons
 }
@@ -4196,23 +4170,19 @@ function processMouseHover() {
                     setSatColor(hoveredIndex, satellites[hoveredIndex].excluded ? 1.0 : 0.3, satellites[hoveredIndex].excluded ? 0.4 : 1.0, satellites[hoveredIndex].excluded ? 0.4 : 0.6);
                 }
             }
-            // Hover expand sprite (skip for already-selected satellite)
+            // Hover expand sprite
             const hSat = satellites[hitIdx];
-            if (hitIdx !== selectedIndex) {
-                if (!hoverSprite) {
-                    const hMat = new THREE.SpriteMaterial({ map: satPointCloud.material.map.clone(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
-                    hoverSprite = new THREE.Sprite(hMat);
-                    hoverSprite.renderOrder = 2;
-                    scene.add(hoverSprite);
-                }
-                const hc = hSat.excluded ? [1.0, 0.4, 0.4] : [0.3, 1.0, 0.6];
-                hoverSprite.material.color.setRGB(hc[0], hc[1], hc[2]);
-                hoverSprite.position.set(hSat.x, hSat.y, hSat.z);
-                hoverSprite.scale.set(0.45, 0.45, 1);
-                hoverSprite.visible = true;
-            } else {
-                if (hoverSprite) hoverSprite.visible = false;
+            if (!hoverSprite) {
+                const hMat = new THREE.SpriteMaterial({ map: satPointCloud.material.map.clone(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+                hoverSprite = new THREE.Sprite(hMat);
+                hoverSprite.renderOrder = 2;
+                scene.add(hoverSprite);
             }
+            const hc = hSat.excluded ? [1.0, 0.4, 0.4] : [0.3, 1.0, 0.6];
+            hoverSprite.material.color.setRGB(hc[0], hc[1], hc[2]);
+            hoverSprite.position.set(hSat.x, hSat.y, hSat.z);
+            hoverSprite.scale.set(0.45, 0.45, 1);
+            hoverSprite.visible = true;
             showTooltip(
                 `<strong>${hSat.name}</strong><br>Alt: ${Math.round(hSat.alt)} km &middot; ${hSat.lat.toFixed(1)}&deg;, ${hSat.lon.toFixed(1)}&deg;`,
                 tx, ty, 'pointer'
