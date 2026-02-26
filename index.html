@@ -802,86 +802,127 @@ canvas { display: block; }
 
 /* === MOBILE (iPhone) === */
 @media (max-width: 480px) {
-    /* Header */
+    /* Header: compact single row */
     #header { padding: 10px 12px; }
     .logo-mark { width: 28px; height: 28px; font-size: 11px; }
     .logo-area { gap: 8px; }
-    .logo-text h1 { font-size: 13px; }
-    .logo-text p { font-size: 9px; }
-    .header-stats { gap: 8px; }
-    .stat-value { font-size: 13px; }
-    .stat-label { font-size: 8px; letter-spacing: 1px; }
-    .data-source-value { font-size: 11px; }
+    .logo-text h1 { font-size: 12px; }
+    .logo-text p { display: none; }
+    .header-stats { gap: 6px; }
+    .stat-value { font-size: 12px; }
+    .stat-label { font-size: 7px; letter-spacing: 0.8px; }
+    .data-source-value { font-size: 10px; }
+    .source-stat-item { padding: 4px 6px; margin: -4px -6px; }
 
-    /* Side panel */
+    /* Side panel: bottom sheet */
     #side-panel {
-        width: calc(100vw - 16px); right: 8px; left: 8px;
-        top: auto; bottom: 0; max-height: 55vh;
-        border-radius: 14px 14px 0 0;
-    }
-    #side-panel.collapsed { transform: translateY(100%); }
-    #panel-toggle {
-        right: 12px; top: auto; bottom: 62px;
-        transform: none;
-        width: 36px; height: 36px;
-        border-radius: 50%;
-        font-size: 12px;
-    }
-    #panel-toggle.panel-open { right: 12px; bottom: calc(55vh + 8px); }
-
-    /* Detail panel */
-    #detail-panel {
-        width: calc(100vw - 16px); left: 8px; right: 8px;
+        width: 100vw; right: 0; left: 0;
         top: auto; bottom: 0; max-height: 50vh;
         border-radius: 14px 14px 0 0;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    #side-panel.collapsed { transform: translateY(100%); }
+    .panel-header { padding: 12px 14px; }
+    .search-box input {
+        padding: 12px 12px 12px 34px;
+        font-size: 16px; /* prevents iOS zoom on focus */
+    }
+
+    /* Panel toggle: bottom right, 44px touch target */
+    #panel-toggle {
+        right: 12px; top: auto;
+        transform: none;
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        font-size: 12px;
+        bottom: calc(56px + env(safe-area-inset-bottom));
+    }
+    #panel-toggle.panel-open {
+        right: 12px;
+        bottom: calc(50vh + 8px + env(safe-area-inset-bottom));
+    }
+
+    /* Detail panel: bottom sheet, collapses side panel */
+    #detail-panel {
+        width: 100vw; left: 0; right: 0;
+        top: auto; bottom: 0; max-height: 55vh;
+        border-radius: 14px 14px 0 0;
         overflow-y: auto;
+        z-index: 12;
+        padding-bottom: env(safe-area-inset-bottom);
     }
     #detail-panel.hidden { transform: translateY(100%); }
     .detail-body { padding: 12px 14px; }
     .detail-header { padding: 12px 14px; }
+    .detail-close { width: 44px; height: 44px; font-size: 20px; }
 
-    /* Clock */
+    /* Clock: bottom center, above safe area */
     #clock {
-        bottom: 8px; padding: 8px 12px; gap: 10px;
-        border-radius: 10px;
+        bottom: 0;
+        padding: 8px 14px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom));
+        gap: 10px;
+        border-radius: 12px 12px 0 0;
+        width: 100vw; left: 0; transform: none;
     }
-    .clock-time { font-size: 12px; }
-    .clock-label { font-size: 8px; }
-    .speed-slider { width: 60px; }
+    .clock-time { font-size: 13px; }
+    .clock-label { font-size: 8px; margin-top: 2px; }
+    .speed-slider {
+        width: 70px; height: 20px;
+        /* bigger touch area, same visual track */
+    }
+    .speed-slider::-webkit-slider-thumb {
+        width: 24px; height: 24px;
+    }
+    .speed-slider::-moz-range-thumb {
+        width: 24px; height: 24px;
+    }
     .speed-label { font-size: 10px; min-width: 32px; }
 
-    /* Bottom actions */
-    #bottom-actions { bottom: 52px; gap: 6px; }
+    /* Bottom actions: row above clock */
+    #bottom-actions {
+        bottom: calc(48px + env(safe-area-inset-bottom));
+        gap: 6px;
+    }
     .bottom-action-btn {
-        padding: 6px 12px; font-size: 10px;
+        padding: 10px 14px; font-size: 10px;
         border-radius: 8px;
+        min-height: 38px;
     }
 
-    /* Toggle controls */
-    #gs-controls { bottom: 52px; left: 8px; gap: 4px; }
+    /* Toggle controls: top left below header (not bottom) */
+    #gs-controls {
+        bottom: auto; top: 56px; left: 8px;
+        gap: 4px;
+    }
     .gs-toggle-btn {
-        padding: 6px 10px; font-size: 10px; gap: 6px;
+        padding: 8px 10px; font-size: 10px; gap: 6px;
         border-radius: 8px;
+        min-height: 34px;
     }
     .gs-toggle-icon { width: 12px; height: 12px; }
     #frame-toggle .frame-opt {
-        padding: 4px 8px; font-size: 9px;
+        padding: 6px 10px; font-size: 9px;
     }
 
-    /* Ground station labels */
-    .gs-label-ttc, .gs-label-gw { font-size: 9px; padding: 2px 6px; }
+    /* Ground station labels: smaller, avoid clutter */
+    .gs-label-ttc, .gs-label-gw {
+        font-size: 8px; padding: 2px 5px;
+        max-width: 90px; overflow: hidden; text-overflow: ellipsis;
+    }
     .gs-sublabel { font-size: 7px; }
 
     /* Tooltip */
     #tooltip { font-size: 11px; padding: 6px 10px; }
 
-    /* Modals */
-    .source-modal, .datetime-modal { width: calc(100vw - 32px); }
+    /* Modals: full width with max-height */
+    .source-modal, .datetime-modal {
+        width: calc(100vw - 24px);
+        max-height: 80vh; overflow-y: auto;
+    }
 
-    /* Safe area for notch/home indicator */
-    #clock { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
-    #side-panel { padding-bottom: env(safe-area-inset-bottom); }
-    #detail-panel { padding-bottom: env(safe-area-inset-bottom); }
+    /* Rotate buttons: hide when not needed to save space */
+    .rotate-btn { padding: 10px 12px; min-height: 38px; }
 }
 </style>
 </head>
