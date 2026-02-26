@@ -1,0 +1,259 @@
+OneWeb Constellation Tracker — How It Works
+============================================
+
+This is a real-time 3D visualisation of the OneWeb satellite constellation
+orbiting Earth. It runs entirely in a web browser with no server backend,
+build tools, or installation required — just open index.html.
+
+
+1. WHERE DOES THE DATA COME FROM?
+----------------------------------
+
+The app loads satellite orbital data from CelesTrak (celestrak.org), a
+well-known public source maintained by Dr T.S. Kelso that mirrors official
+US Space Force tracking data.
+
+Specifically it fetches:
+  https://celestrak.org/NORAD/elements/gp.php?GROUP=oneweb&FORMAT=tle
+
+This returns Two-Line Element Sets (TLEs) — a standardised text format used
+worldwide for describing satellite orbits. Each satellite has a 3-line record:
+
+  ONEWEB-0012
+  1 44057U 19010A   26054.49217491  .00000050  00000-0  46961-4 0  9993
+  2 44057  87.8922 136.8548 0001489  93.2547 266.8749 13.15568789358071
+
+  Line 0: Satellite name (e.g. ONEWEB-0012)
+  Line 1: Catalog number, epoch date, drag terms, element set number
+  Line 2: Inclination, RAAN, eccentricity, argument of perigee,
+           mean anomaly, mean motion (orbits per day), revolution count
+
+These numbers are "mean elements" — orbital parameters averaged over time
+to smooth out short-period perturbations. They're updated roughly once per
+day by the 18th Space Defense Squadron, which tracks all objects in orbit
+using ground-based radars and optical telescopes.
+
+If CelesTrak is unreachable (e.g. due to browser CORS restrictions), the
+app falls back to two CORS proxy services (corsproxy.io, then codetabs.com).
+The header shows "Primary" (green) for direct data or "Secondary" (orange)
+when a proxy was used.
+
+
+2. HOW ACCURATE IS THE DATA?
+-----------------------------
+
+The TLE data is typically accurate to within 1-2 km over a 24-hour period
+for satellites in low Earth orbit like OneWeb (~1,200 km altitude). Accuracy
+degrades the further you project from the TLE's epoch (the time it was
+generated). After 2-3 days without a fresh TLE, positions can drift by
+several kilometres.
+
+The app uses the SGP4 propagator (Simplified General Perturbations model 4)
+to project satellite positions forward in time from the TLE epoch. SGP4 is
+the standard propagator designed specifically for TLE data. It models:
+
+  - Earth's oblateness (the equatorial bulge, J2 perturbation)
+  - Atmospheric drag (gradual orbit decay)
+  - Third-body gravitational effects (Sun and Moon)
+  - Secular and periodic perturbation terms
+
+SGP4 does NOT model:
+  - Satellite manoeuvres (station-keeping burns, collision avoidance)
+  - Solar radiation pressure (small effect at LEO)
+  - Higher-order gravitational harmonics (minor for LEO)
+
+For a real-time visualisation showing the general positions and orbital
+geometry of ~600 satellites, SGP4 with daily TLEs is more than sufficient.
+You can trust the positions shown to be very close to reality within any
+normal browsing session.
+
+Three satellites (0013, 0050, 0618) are hardcoded as "excluded" because
+they are known to be deorbiting or drifting out of the constellation.
+These show as red dots. The TLE data does not contain an explicit
+operational status field, so this exclusion is manual.
+
+
+3. WHAT LANGUAGES AND LIBRARIES ARE USED?
+------------------------------------------
+
+The entire application is a single HTML file containing:
+
+  - HTML5 for document structure
+  - CSS3 for layout, responsive design, and UI styling
+  - JavaScript (ES6+) for all application logic
+  - GLSL (OpenGL Shading Language) for custom GPU shaders
+
+Key libraries (loaded from CDN, no local install needed):
+
+  Three.js v0.160.0 — A 3D graphics library that provides a high-level
+  API over WebGL. Handles the scene graph, camera, lighting, materials,
+  geometry, and rendering pipeline. Think of it as the 3D engine.
+
+  satellite.js v5.0.0 — A JavaScript implementation of the SGP4/SDP4
+  propagation algorithms. Takes TLE data and a target time, returns the
+  satellite's position and velocity in Earth-Centered Inertial (ECI)
+  coordinates. Also provides coordinate transformations (ECI to geodetic
+  latitude/longitude/altitude).
+
+  OrbitControls — A Three.js addon that lets you rotate, zoom, and pan
+  the 3D view with mouse or trackpad gestures.
+
+No build tools, bundlers, or package managers are required. The app runs
+directly in any modern browser.
+
+
+4. HOW IS THE 3D SCENE RENDERED?
+---------------------------------
+
+The app creates a WebGL context via Three.js and renders at ~60 frames
+per second. The scene contains:
+
+EARTH
+  A sphere (96 segments x 64 rings) with a custom GLSL shader that blends
+  two textures:
+
+  - Day texture: NASA Blue Marble image (realistic sunlit Earth)
+  - Night texture: City lights composite (visible on the dark side)
+
+  The shader computes a dot product between each surface point's normal
+  and the sun direction. Where this is positive (sunlit), the day texture
+  is shown with brightness ranging from 0.8x to 1.4x depending on sun
+  angle. Where negative (shadow), city lights appear at 1.5x intensity
+  over a very dim (0.06x) base. The transition between day and night uses
+  a smoothstep function for a sharp but natural terminator line.
+
+  The sun's position is computed from a simplified solar ephemeris:
+  Julian date → mean longitude/anomaly → ecliptic longitude → right
+  ascension and declination, combined with Greenwich Sidereal Time for
+  Earth's rotation. This is accurate to about ±0.5°.
+
+ATMOSPHERE
+  A slightly larger transparent sphere (1.025x Earth radius) rendered
+  with back-face culling. Its shader simulates Rayleigh scattering —
+  the soft blue glow visible at Earth's limb. It brightens on the sunlit
+  side and dims on the dark side.
+
+SATELLITES (~600 points)
+  Rendered as a single Three.js Points object (point cloud). Each
+  satellite is one vertex with:
+  - A position (updated each frame from SGP4 propagation)
+  - A colour (cyan for nominal, red for excluded satellites)
+  - A soft radial-gradient texture for a glowing dot appearance
+
+  Using a single Points geometry with ~600 vertices is far more efficient
+  than rendering 600 individual mesh objects. The GPU draws them all in
+  one draw call.
+
+STARFIELD
+  6,000 procedural stars scattered on a large background sphere,
+  providing visual context and depth.
+
+SUN & MOON
+  Small sphere meshes placed at their computed astronomical positions
+  for visual reference.
+
+GROUND STATIONS
+  TT&C (Telemetry, Tracking & Command) and Gateway ground station markers
+  placed at their real-world coordinates on Earth's surface, with HTML
+  overlay labels.
+
+SAA (SOUTH ATLANTIC ANOMALY)
+  A radiation heatmap overlay showing the South Atlantic Anomaly region.
+  Rendered as a subdivided mesh on Earth's surface with a custom shader
+  that produces a red-yellow-green gradient based on distance from the
+  boundary centre. 18 control points define the boundary, smoothed via
+  Catmull-Rom spline interpolation.
+
+
+5. HOW DOES THE ANIMATION WORK?
+---------------------------------
+
+The animation loop runs via requestAnimationFrame (browser's ~60 Hz
+refresh callback). Each frame:
+
+  1. ADVANCE TIME
+     simTime += deltaTime * timeMultiplier
+     The speed slider sets timeMultiplier from 1x (real-time) to 1200x.
+     Delta time is capped at 0.1 seconds to prevent huge jumps when
+     returning from a background browser tab.
+
+  2. UPDATE SUN DIRECTION
+     Recompute the sun's position for the new simTime. Update the Earth
+     shader, atmosphere shader, directional light, and sun mesh position.
+
+  3. PROPAGATE SATELLITE POSITIONS
+     For each satellite, call satellite.propagate(satrec, simTime) to
+     get its ECI position and velocity. Convert to geodetic coordinates
+     (lat, lon, altitude) then to 3D scene coordinates. Write the new
+     XYZ into the point cloud geometry buffer.
+
+     To save CPU, bulk propagation runs adaptively:
+       - At 1x speed: every 4th frame (~15 updates/second)
+       - At 10-100x: every 2nd frame (~30/sec)
+       - At >100x: every frame (~60/sec)
+
+     The currently selected satellite always updates every frame at 1x
+     for monitoring-grade accuracy.
+
+  4. UPDATE ORBIT PATH
+     If a satellite is selected, recompute its projected orbit path
+     (a line showing one full orbit ahead). Path resolution is reduced
+     at higher time multipliers for performance.
+
+  5. UPDATE UI
+     Refresh the detail panel with current orbital elements, altitude,
+     coordinates, and other readouts.
+
+  6. ANIMATE CAMERA
+     If the camera is tracking a satellite or transitioning to a new
+     view (e.g. edge-on orbital plane view), smoothly interpolate its
+     position. The camera distance from Earth is preserved after each
+     interpolation step to prevent it from cutting through the globe.
+
+  7. RENDER
+     Three.js draws the scene to the WebGL canvas.
+
+
+6. HOW ACCURATE IS THE OVERALL VISUALISATION?
+-----------------------------------------------
+
+WHAT'S ACCURATE:
+  - Satellite positions are correct to within a few km (SGP4 + fresh TLEs)
+  - Orbital geometry is faithful: 12 planes at ~15° RAAN spacing matches
+    the real OneWeb Walker-Star constellation design
+  - Day/night terminator position and Earth rotation match real UTC time
+  - Altitude values use WGS84 geodetic height (accounts for Earth's
+    21 km equatorial bulge), not a simple spherical approximation
+  - All orbital element readouts (inclination, eccentricity, RAAN,
+    argument of latitude, period) use osculating elements computed from
+    the SGP4 state vector each frame, so they exactly match the
+    propagated orbit
+  - Min/max altitude markers are placed at true geodetic altitude
+    extremes (sampled at 360 points around the orbit), not at the
+    Keplerian perigee/apogee which can differ due to Earth's oblateness
+
+WHAT'S APPROXIMATE:
+  - The 3D globe is rendered as a perfect sphere, while the real Earth
+    has a ~21 km equatorial bulge. (The altitude numbers DO account for
+    this via WGS84; only the visual sphere is simplified.)
+  - Sun position is accurate to ±0.5° (sufficient for day/night, not
+    for precision astronomy)
+  - Satellite sizes are massively exaggerated — real OneWeb satellites
+    are about 1 metre across, but the dots are rendered large enough
+    to see and click
+  - Atmosphere thickness and glow are artistic, not physically accurate
+  - Ground station positions are approximate to the nearest city/facility
+
+WHAT'S NOT MODELLED:
+  - Satellite manoeuvres (no way to predict future burns from TLE data)
+  - Real-time operational status (no live telemetry feed)
+  - Signal footprints or coverage areas
+  - Inter-satellite links
+  - Precise solar panel orientation or satellite attitude
+
+In summary: the app provides a highly accurate representation of where
+OneWeb's satellites are right now and how they orbit Earth. The orbital
+mechanics and coordinate systems are rigorous. The visual presentation
+takes some artistic liberties for clarity and aesthetics, but the
+underlying data and propagation are the same tools used by satellite
+operators and space agencies worldwide.
