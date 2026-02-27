@@ -1,5 +1,23 @@
 # OneWeb Constellation Tracker — Changelog
 
+## v11 — Eutelsat GEO Satellite Fleet (2026-02-27)
+**Backup:** `index_v11_geo.html`
+
+### Added
+- **Eutelsat GEO satellites**: Fetches TLE data from CelesTrak (`NAME=EUTELSAT`), filters to station-kept geostationary sats (inclination < 0.5°, mean motion 0.99–1.01 rev/day), and renders them as gold/amber point cloud at ~33 scene units (35,786 km altitude).
+- **GEO toggle button**: New "GEO Sats" toggle at the top of the ground station controls panel. Gold accent (#ffc107), hollow-circle icon. Off by default.
+- **GEO orbit ring**: Thin dashed gold circle in the equatorial plane at GEO altitude, providing a visual reference for the geostationary belt. Toggles with the GEO button.
+- **GEO satellite labels**: Screen-space HTML labels for each Eutelsat satellite showing name and orbital slot (e.g. "HOTBIRD 13F · 13.0°E"). Gold text, behind-globe occlusion, same positioning pattern as ground station labels.
+- **ECI/ECEF frame support**: GEO positions and labels update correctly in both reference frames. Positions force-refresh on frame switch.
+
+### Technical Details
+- CORS proxy fallback chain identical to OneWeb TLE fetch (corsproxy.io → codetabs.com).
+- GEO position updates run every 30th frame at 1x speed (GEO sats barely move), scaling to every frame at >100x.
+- Point size 0.4 (larger than OneWeb's 0.22) since GEO sats are further from camera at default zoom.
+- Reuses existing allocation-free helpers (`geoToVec3Into`, `_geoOut`, `_camToStation`, etc.) for zero-GC label projection.
+
+---
+
 ## v10 — Excluded Satellite Styling, Plane Selection & UX Polish (2026-02-26)
 **Backup:** `index_v10_exclusions.html`
 
