@@ -993,6 +993,13 @@ canvas { display: block; }
     position: fixed; bottom: 20px; left: 16px; z-index: 10;
     display: flex; flex-direction: column; gap: 6px;
 }
+.gs-toggle-half-row {
+    display: flex; gap: 6px;
+}
+.gs-toggle-half {
+    flex: 1; min-width: 0; justify-content: center;
+    padding: 7px 8px;
+}
 .gs-toggle-btn {
     display: flex; align-items: center; gap: 8px;
     padding: 7px 14px;
@@ -1098,6 +1105,27 @@ canvas { display: block; }
     border-color: #ff5252;
     box-shadow: 0 0 4px #ff5252;
     background: rgba(255, 82, 82, 0.3);
+}
+.gs-toggle-btn.active-stars { border-color: #e8eaed; color: #e8eaed; }
+.gs-toggle-icon .stars-icon {
+    width: 8px; height: 8px; position: relative;
+}
+.gs-toggle-icon .stars-icon::before,
+.gs-toggle-icon .stars-icon::after {
+    content: ''; position: absolute; border-radius: 50%;
+    background: var(--text-dim); transition: background 0.2s, box-shadow 0.2s;
+}
+.gs-toggle-icon .stars-icon::before {
+    width: 4px; height: 4px; top: 0; left: 0;
+}
+.gs-toggle-icon .stars-icon::after {
+    width: 2px; height: 2px; bottom: 0; right: 0;
+}
+.gs-toggle-btn.active-stars .stars-icon::before {
+    background: #e8eaed; box-shadow: 0 0 4px rgba(255,255,255,0.8);
+}
+.gs-toggle-btn.active-stars .stars-icon::after {
+    background: #e8eaed; box-shadow: 0 0 3px rgba(255,255,255,0.6);
 }
 #frame-toggle {
     display: flex; align-items: center;
@@ -1900,6 +1928,16 @@ canvas { display: block; }
 
 <!-- Toggle Controls -->
 <div id="gs-controls">
+    <div class="gs-toggle-half-row">
+        <div class="gs-toggle-btn gs-toggle-half active-stars" id="toggle-stars">
+            <div class="gs-toggle-icon"><div class="stars-icon"></div></div>
+            Stars
+        </div>
+        <div class="gs-toggle-btn gs-toggle-half" id="toggle-saa">
+            <div class="gs-toggle-icon"><div class="saa-icon"></div></div>
+            SAA
+        </div>
+    </div>
     <div class="gs-toggle-btn" id="toggle-geo">
         <div class="gs-toggle-icon"><div class="geo-icon"></div></div>
         GEO Sats
@@ -1915,10 +1953,6 @@ canvas { display: block; }
     <div class="gs-toggle-btn active-sun" id="toggle-sun">
         <div class="gs-toggle-icon"><div class="sun-icon"></div></div>
         Sun Lighting
-    </div>
-    <div class="gs-toggle-btn" id="toggle-saa">
-        <div class="gs-toggle-icon"><div class="saa-icon"></div></div>
-        SAA Zone
     </div>
     <div id="frame-toggle">
         <div class="frame-slider"></div>
@@ -7810,6 +7844,14 @@ document.getElementById('toggle-geo').addEventListener('click', () => {
         _geoPreViewPos = null;
         _geoPreViewTarget = null;
     }
+});
+
+// Stars toggle
+let starsVisible = true;
+document.getElementById('toggle-stars').addEventListener('click', () => {
+    starsVisible = !starsVisible;
+    document.getElementById('toggle-stars').classList.toggle('active-stars', starsVisible);
+    if (starField) starField.visible = starsVisible;
 });
 
 // SAA zone toggle

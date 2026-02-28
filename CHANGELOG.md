@@ -11,7 +11,8 @@
 - **TLE age graph**: Clickable fleet-wide TLE age distribution histogram with oldest TLE list.
 
 ### Changed
-- **GEO Sats button removed**: Removed the `#toggle-geo` button from the controls bar. GEO satellite visibility is now exclusively controlled via the Catalog panel's Eutelsat GEO row, reducing control clutter.
+- **GEO Sats button removed** (experimental): Removed the `#toggle-geo` button from the controls bar. GEO satellite visibility is now exclusively controlled via the Catalog panel's Eutelsat GEO row, reducing control clutter.
+- **Compact toggle buttons**: Stars & SAA (experimental) / GEO & SAA (index) paired side-by-side in a half-width row, freeing vertical space in the controls bar.
 - **TT&C panel z-index**: Lowered from 10 to 8 so TT&C countdown panels render behind the Catalog panel when overlapping.
 - **Orbital plot UTC parsing**: Start/end time inputs now parsed as UTC via `inputToUTC()` helper.
 - **Oldest TLE list scrollbar**: Custom webkit scrollbar styling (4px, transparent track).
