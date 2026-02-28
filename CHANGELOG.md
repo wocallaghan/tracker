@@ -1,5 +1,28 @@
 # OneWeb Constellation Tracker — Changelog
 
+## v13 — Orbital Element Plot Popup & GEO Camera Restore (2026-02-28)
+**Backup:** `index_v13_plot.html`
+
+### Added
+- **Orbital element plot popup**: New chart button in the satellite detail panel header opens a resizable browser popup window for plotting orbital elements over time using Plotly.js.
+  - **9 plottable elements**: Latitude, Longitude, Altitude, Velocity, Inclination, Eccentricity, RAAN, Argument of Latitude, Semi-major Axis — each with a distinct colour and toggleable checkbox.
+  - **Satellite dropdown**: Switch between any satellite without closing the popup. Time range auto-adjusts to ±1 orbital period.
+  - **Time range controls**: Start/end datetime-local inputs with Update button. Default range centres on current simulation time.
+  - **Multi-axis plotting**: Y-axes grouped by unit (°, km, km/s, dimensionless) with left/right placement.
+  - **Export PNG**: Downloads chart as 1200x600 PNG via Plotly.
+  - **Export CSV**: Downloads all propagated data (all 9 elements) as a CSV file.
+  - **Dark theme**: Matches the main app's colour scheme (#0a0e14 background, cyan/orange/green accents).
+  - **Fully self-contained**: Popup loads its own satellite.js and Plotly.js from CDN. Satellite data (satrec objects) injected onto the popup window. No `window.opener` dependency — works reliably from `file://` protocol.
+- **GEO toggle camera restore**: Toggling GEO satellites off now animates the camera back to the position it was in before the GEO zoom-out. Previously the camera stayed at the wide GEO viewing angle.
+
+### Technical Details
+- Popup uses `function.toString()` injection pattern: `_popupAppMain()` defined in the main module, serialised to string, injected as a `<script>` element in the popup. This ensures all code (Plotly.react, satellite.propagate, DOM manipulation) executes in the popup's own window context, avoiding Plotly.js cross-context rendering issues ([plotly/plotly.js#702](https://github.com/plotly/plotly.js/issues/702)).
+- CDN script loading chain: satellite.js → Plotly.js → app script, with `onerror` handlers for user feedback on load failure.
+- Osculating orbital elements computed from ECI state vector at 30-second intervals (same math as `updateDetailPanel`).
+- GEO camera state saved in `_geoPreViewPos` / `_geoPreViewTarget` before zoom-out, restored via `animateCameraToVizView()` on toggle off.
+
+---
+
 ## v12 — Multi-Satellite TT&C Alarms, GEO Info Panel & Search (2026-02-28)
 **Backup:** `index_v12_alarms_geo.html`
 
