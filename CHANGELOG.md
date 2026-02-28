@@ -1,5 +1,34 @@
 # OneWeb Constellation Tracker — Changelog
 
+## v12 — Multi-Satellite TT&C Alarms, GEO Info Panel & Search (2026-02-28)
+**Backup:** `index_v12_alarms_geo.html`
+
+### Added
+- **Multi-satellite TT&C alarms**: Replaced single-boolean alarm with a `Map`-based system supporting simultaneous alarms on multiple satellites. Alarms persist across satellite deselection.
+- **Alarm management panel**: Integrated into the header stats bar (replaces Planes count). Shows alarm count with gold accent when active. Click to open panel listing all alarmed satellites with remove buttons.
+- **Alarm toast notification**: Top-center popup when a satellite is within 60s of a TT&C pass. Requires manual dismissal (Dismiss button). Continuous looping alarm sound until dismissed.
+- **Per-station per-pass firing**: Alarms fire independently for Svalbard and Inuvik passes using composite `stationIdx:aosMs` keys in a Set.
+- **localStorage alarm persistence**: Alarms saved as NORAD IDs to localStorage, restored on page load. Survives browser refreshes.
+- **SVG alarm icon**: Custom line-drawing alarm clock in the detail panel header (grey when off, orange when active).
+- **GEO satellite info panel**: Click any GEO satellite dot or label to see a gold-accented info panel showing satellite name, orbital slot, services, and description. Comprehensive `GEO_SAT_INFO` lookup covering all Eutelsat positions.
+- **GEO search integration**: Type "GEO" or "Eutelsat" in the search bar to list all GEO satellites. Selecting one zooms to it, opens the info panel, and auto-enables GEO visibility.
+- **Clickable GEO labels**: GEO satellite names on the globe are now clickable (opens info panel without adjusting view).
+- **GEO selection highlight**: Selected GEO satellite name turns white and bold, dot enlarges with a white highlight sprite. Cleared on deselection.
+- **GEO toggle camera view**: Toggling GEO satellites on animates to a wide view showing the full geostationary ring.
+- **Orbital parameter follow-mode exit**: Clicking any orbital parameter visualization (Inc, RAAN, AoL, Ecc) now disables follow mode.
+
+### Fixed
+- **Duplicate alarm firing**: Rounded AOS timestamps to nearest 10 seconds in fired-key generation, preventing recomputed passes with slightly different timestamps from triggering duplicate alarms.
+
+### Technical Details
+- `_ttcAlarms` Map keyed by satellite index, each entry tracks `firedForAos` Set, cached `passes` array, and `lastPredictTime`.
+- Pass predictions cached per alarmed satellite, recomputed only on >60s sim-time drift.
+- Alarm sound: Web Audio API triple-tone chime (660/880/1100 Hz), looping every 2.5s via `setInterval`.
+- GEO raycasting: Separate hit detection for GEO point cloud in `onMouseClick` and `processMouseHover`, with `isGeoSatVisible()` occlusion check.
+- GEO list items appended asynchronously when GEO TLE data loads (separate from LEO `buildSatList`).
+
+---
+
 ## v11 — Eutelsat GEO Satellite Fleet (2026-02-27)
 **Backup:** `index_v11_geo.html`
 
