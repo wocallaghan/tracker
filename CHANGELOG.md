@@ -1,5 +1,39 @@
 # OneWeb Constellation Tracker — Changelog
 
+## v16 — Constellation Trails, Catalog Preload & UI Cleanup (2026-02-28)
+**Backup:** `index_v15_tlegraph.html`
+
+### Added
+- **Constellation trail lines**: Per-group orbital trail visualization toggled via a new orbit-icon button on each catalog row. Renders one full orbital period per satellite as `THREE.LineSegments` with additive blending. Adaptive sampling: Starlink (200 sampled, 40 steps), OneWeb (all, 60 steps), GPS (all, 120 steps). Async computation with batched yields to keep the UI responsive. Trails auto-recompute on time progression (throttled: 4s at 1x, 1s at >100x) and immediately on reference frame switch. Coexists with single-satellite orbit paths.
+- **Background catalog preload**: All CelesTrak catalog groups now load automatically in the background 2 seconds after app launch (2 parallel streams, 300ms stagger). Groups load hidden — clicking a preloaded group in the Catalog panel toggles it on instantly with no fetch delay. `loadCatalogGroup()` accepts `{ showOnLoad: false }` to support preloading without making satellites visible.
+- **HD satellite point textures**: All satellite dot textures upgraded from 64x64 to 128x128 canvas with improved radial gradient (tighter bright core at 15%, smoother mid-falloff at 35%/60%, cleaner edge). Applies to OneWeb, GEO, and shared catalog point clouds.
+- **TLE age field**: Satellite detail panel shows TLE age with colour coding (green <3 days, yellow 3-7 days, red >7 days).
+- **TLE age graph**: Clickable fleet-wide TLE age distribution histogram with oldest TLE list.
+
+### Changed
+- **GEO Sats button removed**: Removed the `#toggle-geo` button from the controls bar. GEO satellite visibility is now exclusively controlled via the Catalog panel's Eutelsat GEO row, reducing control clutter.
+- **TT&C panel z-index**: Lowered from 10 to 8 so TT&C countdown panels render behind the Catalog panel when overlapping.
+- **Orbital plot UTC parsing**: Start/end time inputs now parsed as UTC via `inputToUTC()` helper.
+- **Oldest TLE list scrollbar**: Custom webkit scrollbar styling (4px, transparent track).
+
+### Technical Details
+- `_constellationTrails` object stores per-group trail state: `LineSegments`, geometry, material, enabled/dirty/computing flags, and recompute timestamps.
+- Trail computation uses SGP4 propagation with `satellite.propagate()`, supporting both ECEF and ECI reference frames.
+- Buffer reuse: `buildTrailLineSegments()` reuses existing Float32Array if large enough, only reallocates when buffer is too small.
+- Integration points: `toggleCatalogGroup()`, `_toggleBuiltinOneweb()`, `_toggleBuiltinGeo()`, `setReferenceFrame()`, and "All Off" handler all sync trail visibility and dirty state.
+- Background preload uses sequential chained loading with `loadNext()` callback pattern, 2 concurrent streams.
+
+---
+
+## v15 — TLE Age Graph & Oldest TLE List (2026-02-28)
+**Backup:** `index_v15_tlegraph.html`
+
+### Added
+- **TLE age distribution graph**: Clickable TLE age stat opens a fleet-wide histogram popup showing the distribution of TLE ages across all OneWeb satellites.
+- **Oldest TLE list**: Scrollable list of the satellites with the oldest TLEs, sorted by age descending.
+
+---
+
 ## v14 — Plane Folders, Formation Badges & Alarm Reliability (2026-02-28)
 **Backup:** `index_v14_planes_alarms.html`
 

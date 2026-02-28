@@ -699,7 +699,7 @@ canvas { display: block; }
 .detail-field-value.clickable.viz-active { color: var(--orange); text-shadow: 0 0 8px rgba(255, 107, 53, 0.3); }
 
 .ttc-panel {
-    position: fixed; left: 16px; z-index: 10;
+    position: fixed; left: 16px; z-index: 8;
     width: 300px;
     background: var(--bg-panel);
     border: 1px solid var(--border);
@@ -1046,17 +1046,6 @@ canvas { display: block; }
     background: #ffb74d;
     box-shadow: 0 0 6px #ffb74d;
 }
-.gs-toggle-btn.active-geo { border-color: #ffc107; color: #ffc107; }
-.gs-toggle-icon .geo-icon {
-    width: 8px; height: 8px;
-    border: 1.5px solid var(--text-dim);
-    border-radius: 50%;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-.gs-toggle-btn.active-geo .geo-icon {
-    border-color: #ffc107;
-    box-shadow: 0 0 4px #ffc107;
-}
 .geo-label {
     position: fixed; left: 0; top: 0; z-index: 9;
     pointer-events: auto; cursor: pointer;
@@ -1098,6 +1087,165 @@ canvas { display: block; }
     border-color: #ff5252;
     box-shadow: 0 0 4px #ff5252;
     background: rgba(255, 82, 82, 0.3);
+}
+.gs-toggle-btn.active-stars { border-color: #e8eaed; color: #e8eaed; }
+.gs-toggle-icon .stars-icon {
+    width: 8px; height: 8px; position: relative;
+}
+.gs-toggle-icon .stars-icon::before,
+.gs-toggle-icon .stars-icon::after {
+    content: ''; position: absolute; border-radius: 50%;
+    background: var(--text-dim); transition: background 0.2s, box-shadow 0.2s;
+}
+.gs-toggle-icon .stars-icon::before {
+    width: 4px; height: 4px; top: 0; left: 0;
+}
+.gs-toggle-icon .stars-icon::after {
+    width: 2px; height: 2px; bottom: 0; right: 0;
+}
+.gs-toggle-btn.active-stars .stars-icon::before {
+    background: #e8eaed; box-shadow: 0 0 4px rgba(255,255,255,0.8);
+}
+.gs-toggle-btn.active-stars .stars-icon::after {
+    background: #e8eaed; box-shadow: 0 0 3px rgba(255,255,255,0.6);
+}
+.gs-toggle-btn.active-catalog { border-color: #b388ff; color: #b388ff; }
+.gs-toggle-icon .catalog-icon {
+    width: 8px; height: 8px;
+    border: 1.5px solid var(--text-dim);
+    border-radius: 2px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+.gs-toggle-icon .catalog-icon::after {
+    content: '+'; position: absolute; top: -4px; right: -4px;
+    font-size: 8px; font-weight: 700; line-height: 1; color: var(--text-dim);
+    transition: color 0.2s;
+}
+.gs-toggle-btn.active-catalog .catalog-icon {
+    border-color: #b388ff;
+    box-shadow: 0 0 4px #b388ff;
+}
+.gs-toggle-btn.active-catalog .catalog-icon::after { color: #b388ff; }
+
+/* === CATALOG PANEL === */
+#catalog-panel {
+    position: fixed; bottom: 20px; left: 220px; z-index: 10;
+    width: 280px; max-height: 65vh;
+    background: var(--bg-panel);
+    border: 1px solid rgba(179, 136, 255, 0.25);
+    border-radius: 14px;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    overflow: hidden;
+    transform: translateX(-20px); opacity: 0; pointer-events: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+#catalog-panel.open {
+    transform: translateX(0); opacity: 1; pointer-events: auto;
+}
+.catalog-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(179, 136, 255, 0.12);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.catalog-header-title {
+    font-size: 12px; font-weight: 600; color: #b388ff;
+    text-transform: uppercase; letter-spacing: 1.5px;
+}
+.catalog-close {
+    width: 24px; height: 24px; display: flex;
+    align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text-secondary);
+    cursor: pointer; font-size: 14px; transition: all 0.2s;
+}
+.catalog-close:hover { border-color: #b388ff; color: var(--text-primary); }
+.catalog-body {
+    overflow-y: auto; max-height: calc(65vh - 48px);
+    padding: 6px 0;
+}
+.catalog-body::-webkit-scrollbar { width: 4px; }
+.catalog-body::-webkit-scrollbar-track { background: transparent; }
+.catalog-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.catalog-category {
+    padding: 0 8px;
+}
+.catalog-category-header {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 8px; cursor: pointer; user-select: none;
+    border-radius: 6px; transition: background 0.15s;
+}
+.catalog-category-header:hover { background: rgba(255,255,255,0.04); }
+.catalog-category-chevron {
+    font-size: 8px; color: var(--text-dim);
+    transition: transform 0.2s; width: 12px; text-align: center;
+}
+.catalog-category.collapsed .catalog-category-chevron { transform: rotate(-90deg); }
+.catalog-category-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.2px; color: var(--text-secondary);
+}
+.catalog-category-body { padding: 0 4px; }
+.catalog-category.collapsed .catalog-category-body { display: none; }
+.catalog-group-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 8px; border-radius: 6px;
+    cursor: pointer; transition: background 0.15s;
+}
+.catalog-group-row:hover { background: rgba(255,255,255,0.04); }
+.catalog-group-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    opacity: 0.4; transition: opacity 0.2s;
+}
+.catalog-group-row.active .catalog-group-dot { opacity: 1; }
+.catalog-group-label {
+    font-size: 11px; color: var(--text-secondary);
+    flex: 1; transition: color 0.2s;
+}
+.catalog-group-row.active .catalog-group-label { color: var(--text-primary); }
+.catalog-group-count {
+    font-family: var(--font-mono); font-size: 9px;
+    color: var(--text-dim); background: rgba(255,255,255,0.06);
+    padding: 1px 6px; border-radius: 8px; min-width: 20px; text-align: center;
+}
+.catalog-group-spinner {
+    width: 12px; height: 12px;
+    border: 1.5px solid var(--border);
+    border-top-color: #b388ff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+.catalog-select-all {
+    font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+    padding: 3px 8px; border-radius: 5px;
+    background: rgba(179, 136, 255, 0.1);
+    border: 1px solid rgba(179, 136, 255, 0.25);
+    color: #b388ff; cursor: pointer;
+    transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.catalog-select-all:hover {
+    background: rgba(179, 136, 255, 0.2);
+    border-color: rgba(179, 136, 255, 0.4);
+}
+.catalog-trail-btn {
+    width: 22px; height: 22px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px; cursor: pointer;
+    opacity: 0.15; pointer-events: none;
+    transition: opacity 0.2s, background 0.2s;
+}
+.catalog-trail-btn.enabled {
+    opacity: 1; pointer-events: auto;
+}
+.catalog-trail-btn.enabled:hover {
+    background: rgba(255,255,255,0.08);
+}
+.catalog-trail-btn.active {
+    opacity: 1;
+}
+.catalog-trail-btn.active svg { filter: drop-shadow(0 0 3px currentColor); }
+.catalog-trail-btn svg {
+    width: 14px; height: 14px;
 }
 #frame-toggle {
     display: flex; align-items: center;
@@ -1211,6 +1359,7 @@ canvas { display: block; }
     #side-panel { width: 260px; right: 8px; top: 70px; bottom: 70px; }
     #detail-panel { width: 260px; left: 8px; }
     #geo-panel { width: 260px; left: 8px; }
+    #catalog-panel { left: 180px; width: 240px; }
     .header-stats { gap: 16px; }
     .stat-value { font-size: 16px; }
     #panel-toggle.panel-open { right: 278px; }
@@ -1278,6 +1427,10 @@ canvas { display: block; }
         padding-bottom: env(safe-area-inset-bottom);
     }
     #geo-panel.hidden { transform: translateY(100%); }
+    #catalog-panel {
+        left: 8px; bottom: auto; top: 70px;
+        width: calc(100vw - 16px); max-height: 50vh;
+    }
     .detail-body { padding: 12px 14px; }
     .detail-header { padding: 12px 14px; }
     .detail-close { width: 44px; height: 44px; font-size: 20px; }
@@ -1738,6 +1891,18 @@ canvas { display: block; }
     </div>
 </div>
 
+<!-- Catalog Panel -->
+<div id="catalog-panel">
+    <div class="catalog-header">
+        <div class="catalog-header-title">Satellite Catalog</div>
+        <div style="display:flex;align-items:center;gap:6px">
+            <button class="catalog-select-all" id="catalog-select-all">All On</button>
+            <button class="catalog-close" id="catalog-close">&times;</button>
+        </div>
+    </div>
+    <div class="catalog-body" id="catalog-body"></div>
+</div>
+
 <!-- TT&C Pass Panels -->
 <div class="ttc-panel" id="ttc-panel-svalbard">
     <div class="ttc-panel-row">
@@ -1900,9 +2065,9 @@ canvas { display: block; }
 
 <!-- Toggle Controls -->
 <div id="gs-controls">
-    <div class="gs-toggle-btn" id="toggle-geo">
-        <div class="gs-toggle-icon"><div class="geo-icon"></div></div>
-        GEO Sats
+    <div class="gs-toggle-btn active-stars" id="toggle-stars">
+        <div class="gs-toggle-icon"><div class="stars-icon"></div></div>
+        Stars
     </div>
     <div class="gs-toggle-btn active-ttc" id="toggle-ttc">
         <div class="gs-toggle-icon"><div class="diamond"></div></div>
@@ -1919,6 +2084,10 @@ canvas { display: block; }
     <div class="gs-toggle-btn" id="toggle-saa">
         <div class="gs-toggle-icon"><div class="saa-icon"></div></div>
         SAA Zone
+    </div>
+    <div class="gs-toggle-btn" id="toggle-catalog">
+        <div class="gs-toggle-icon"><div class="catalog-icon"></div></div>
+        Catalog
     </div>
     <div id="frame-toggle">
         <div class="frame-slider"></div>
@@ -2009,6 +2178,48 @@ const EARTH_RADIUS_KM = 6371;
 const SAT_SCALE = EARTH_RADIUS / EARTH_RADIUS_KM;
 const TLE_URL = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=oneweb&FORMAT=tle';
 const GEO_TLE_URL = 'https://celestrak.org/NORAD/elements/gp.php?NAME=EUTELSAT&FORMAT=tle';
+const CATALOG_GROUPS = [
+    // Eutelsat (built-in, already loaded)
+    { key: 'oneweb', label: 'OneWeb', builtin: 'oneweb', color: '#00e5ff', size: 0.22, category: 'Eutelsat' },
+    { key: 'eutelsat-geo', label: 'Eutelsat GEO', builtin: 'geo', color: '#ffc107', size: 0.40, category: 'Eutelsat' },
+    // Mega-Constellations
+    { key: 'starlink', label: 'Starlink', groupId: 'starlink', color: '#c0c0c0', size: 0.12, category: 'Mega-Constellations' },
+    { key: 'planet', label: 'Planet', groupId: 'planet', color: '#76ff03', size: 0.18, category: 'Mega-Constellations' },
+    { key: 'spire', label: 'Spire', groupId: 'spire', color: '#69f0ae', size: 0.18, category: 'Mega-Constellations' },
+    // Navigation
+    { key: 'gps', label: 'GPS', groupId: 'gps-ops', color: '#448aff', size: 0.35, category: 'Navigation' },
+    { key: 'glonass', label: 'GLONASS', groupId: 'glo-ops', color: '#ff5252', size: 0.35, category: 'Navigation' },
+    { key: 'galileo', label: 'Galileo', groupId: 'galileo', color: '#ffd740', size: 0.35, category: 'Navigation' },
+    { key: 'beidou', label: 'BeiDou', groupId: 'beidou', color: '#ff6e40', size: 0.35, category: 'Navigation' },
+    { key: 'sbas', label: 'SBAS', groupId: 'sbas', color: '#ea80fc', size: 0.30, category: 'Navigation' },
+    // Communications
+    { key: 'iridium', label: 'Iridium NEXT', groupId: 'iridium-NEXT', color: '#80d8ff', size: 0.22, category: 'Communications' },
+    { key: 'globalstar', label: 'Globalstar', groupId: 'globalstar', color: '#b9f6ca', size: 0.22, category: 'Communications' },
+    { key: 'orbcomm', label: 'ORBCOMM', groupId: 'orbcomm', color: '#f4ff81', size: 0.22, category: 'Communications' },
+    { key: 'ses', label: 'SES', groupId: 'ses', color: '#ffe57f', size: 0.22, category: 'Communications' },
+    { key: 'intelsat', label: 'Intelsat', groupId: 'intelsat', color: '#ffcc80', size: 0.22, category: 'Communications' },
+    { key: 'swarm', label: 'Swarm', groupId: 'swarm', color: '#a7ffeb', size: 0.15, category: 'Communications' },
+    { key: 'amateur', label: 'Amateur Radio', groupId: 'amateur', color: '#e040fb', size: 0.20, category: 'Communications' },
+    // Weather & Earth Obs
+    { key: 'weather', label: 'Weather', groupId: 'weather', color: '#18ffff', size: 0.28, category: 'Weather & Earth Obs' },
+    { key: 'noaa', label: 'NOAA', groupId: 'noaa', color: '#64ffda', size: 0.28, category: 'Weather & Earth Obs' },
+    { key: 'goes', label: 'GOES', groupId: 'goes', color: '#84ffff', size: 0.30, category: 'Weather & Earth Obs' },
+    { key: 'resource', label: 'Earth Resources', groupId: 'resource', color: '#ccff90', size: 0.22, category: 'Weather & Earth Obs' },
+    { key: 'sarsat', label: 'SARSAT', groupId: 'sarsat', color: '#ff8a80', size: 0.25, category: 'Weather & Earth Obs' },
+    { key: 'argos', label: 'ARGOS', groupId: 'argos', color: '#b388ff', size: 0.22, category: 'Weather & Earth Obs' },
+    // Science & Special
+    { key: 'stations', label: 'Space Stations', groupId: 'stations', color: '#ffffff', size: 0.50, category: 'Science & Special' },
+    { key: 'science', label: 'Science', groupId: 'science', color: '#82b1ff', size: 0.22, category: 'Science & Special' },
+    { key: 'geodetic', label: 'Geodetic', groupId: 'geodetic', color: '#f48fb1', size: 0.22, category: 'Science & Special' },
+    { key: 'engineering', label: 'Engineering', groupId: 'engineering', color: '#ce93d8', size: 0.20, category: 'Science & Special' },
+    { key: 'education', label: 'Education', groupId: 'education', color: '#81d4fa', size: 0.20, category: 'Science & Special' },
+    // Other
+    { key: 'military', label: 'Military', groupId: 'military', color: '#90a4ae', size: 0.18, category: 'Other' },
+    { key: 'radar', label: 'Radar Calibration', groupId: 'radar', color: '#bcaaa4', size: 0.22, category: 'Other' },
+    { key: 'cubesat', label: 'CubeSats', groupId: 'cubesat', color: '#80cbc4', size: 0.15, category: 'Other' },
+    { key: 'last-30-days', label: 'Last 30 Days', groupId: 'last-30-days', color: '#ffab91', size: 0.20, category: 'Other' },
+    { key: 'visual', label: 'Brightest', groupId: 'visual', color: '#fff59d', size: 0.25, category: 'Other' },
+];
 const DEG2RAD = Math.PI / 180;
 const RAD2DEG = 180 / Math.PI;
 
@@ -2070,6 +2281,28 @@ let geoOrbitRing = null;
 let _geoFrameCount = 0;
 let _geoPreViewPos = null; // saved camera position before GEO zoom
 let _geoPreViewTarget = null;
+
+// Catalog state (per-group lazy-loaded constellations)
+const catalogState = {}; // key -> { satellites, visible, loaded, loading, tleText, frameCount, baseColor }
+let catalogPanelOpen = false;
+let selectedCatalogGroup = null;
+let selectedCatalogIndex = -1;
+let _catalogHighlightSprite = null;
+let _sharedPointTexture = null; // shared across all point clouds
+
+// Merged catalog point cloud — single draw call for all catalog groups
+const _catalogMerged = {
+    geometry: null,
+    pointCloud: null,
+    material: null,
+    totalUsed: 0,
+    capacity: 20000,
+    ranges: {},     // key -> { start, count }
+};
+
+// Constellation trail lines — per-group orbital trail visualization
+// key -> { lineSegments, geometry, material, enabled, dirty, computing, lastComputeMs, sampledIndices, stepsPerSat, satCount }
+const _constellationTrails = {};
 
 // SAA contour at LEO altitude (~500-1200km), approx 10^2 protons/cm²/s flux boundary
 // Center ~27°S 49°W, extends ~5°S-45°S lat, ~80°W-5°E lon (tilted NW-SE oval)
@@ -2821,6 +3054,7 @@ function parseTLEData(text) {
     buildSatList();
     updateStats();
     restoreAlarmsFromStorage();
+    updateBuiltinCatalogCounts();
 }
 
 // Satellites excluded from plane assignment (e.g. deorbiting, drifting)
@@ -2992,6 +3226,7 @@ function parseGeoTLEData(text) {
     createGeoOrbitRing();
     createGeoLabels();
     appendGeoListItems();
+    updateBuiltinCatalogCounts();
 }
 
 function createGeoPoints() {
@@ -3004,18 +3239,19 @@ function createGeoPoints() {
     geoGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geoGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-    // Reuse point texture pattern
+    // Reuse point texture pattern (HD 128x128)
     const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
+    canvas.width = 128;
+    canvas.height = 128;
     const ctx = canvas.getContext('2d');
-    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
     gradient.addColorStop(0, 'rgba(255,255,255,1)');
-    gradient.addColorStop(0.2, 'rgba(255,255,255,0.9)');
-    gradient.addColorStop(0.5, 'rgba(255,255,255,0.3)');
+    gradient.addColorStop(0.15, 'rgba(255,255,255,0.95)');
+    gradient.addColorStop(0.35, 'rgba(255,255,255,0.5)');
+    gradient.addColorStop(0.6, 'rgba(255,255,255,0.12)');
     gradient.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 64, 64);
+    ctx.fillRect(0, 0, 128, 128);
     const pointTexture = new THREE.CanvasTexture(canvas);
 
     const mat = new THREE.PointsMaterial({
@@ -3202,6 +3438,10 @@ function selectGeoSatellite(geoIdx) {
         return;
     }
 
+    // Clear catalog selection
+    clearCatalogSelection();
+    $detailPanel.classList.add('hidden');
+
     // Close LEO detail panel and stop tracking if active
     if (trackingIndex >= 0) stopTracking();
     if (selectedIndex >= 0) {
@@ -3281,7 +3521,6 @@ function isGeoSatVisible(idx) {
 function ensureGeoVisible() {
     if (geoSatsVisible) return;
     geoSatsVisible = true;
-    document.getElementById('toggle-geo').classList.add('active-geo');
     if (geoPointCloud) geoPointCloud.visible = true;
     if (geoOrbitRing) geoOrbitRing.visible = true;
     for (const gs of geoSatellites) {
@@ -3383,6 +3622,840 @@ function updateGeoLabels() {
 }
 
 // ============================================================
+// CATALOG SATELLITE SYSTEM
+// ============================================================
+function _getSharedPointTexture() {
+    if (_sharedPointTexture) return _sharedPointTexture;
+    const canvas = document.createElement('canvas');
+    canvas.width = 128; canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gradient.addColorStop(0, 'rgba(255,255,255,1)');
+    gradient.addColorStop(0.15, 'rgba(255,255,255,0.95)');
+    gradient.addColorStop(0.35, 'rgba(255,255,255,0.5)');
+    gradient.addColorStop(0.6, 'rgba(255,255,255,0.12)');
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 128, 128);
+    _sharedPointTexture = new THREE.CanvasTexture(canvas);
+    return _sharedPointTexture;
+}
+
+function buildCatalogPanel() {
+    const $body = document.getElementById('catalog-body');
+    $body.innerHTML = '';
+    const categories = {};
+    for (const g of CATALOG_GROUPS) {
+        if (!categories[g.category]) categories[g.category] = [];
+        categories[g.category].push(g);
+    }
+    for (const [cat, groups] of Object.entries(categories)) {
+        const catDiv = document.createElement('div');
+        catDiv.className = 'catalog-category';
+        const catHeader = document.createElement('div');
+        catHeader.className = 'catalog-category-header';
+        catHeader.innerHTML = `<span class="catalog-category-chevron">&#9660;</span><span class="catalog-category-label">${cat}</span>`;
+        catHeader.addEventListener('click', () => catDiv.classList.toggle('collapsed'));
+        catDiv.appendChild(catHeader);
+        const catBody = document.createElement('div');
+        catBody.className = 'catalog-category-body';
+        for (const g of groups) {
+            const row = document.createElement('div');
+            row.className = 'catalog-group-row';
+            row.dataset.groupKey = g.key;
+            // Mark builtin OneWeb as active (visible by default)
+            if (g.builtin === 'oneweb') row.classList.add('active');
+            row.innerHTML = `<div class="catalog-group-dot" style="background:${g.color}"></div><div class="catalog-group-label">${g.label}</div><div class="catalog-trail-btn${g.builtin === 'oneweb' ? ' enabled' : ''}" data-trail-key="${g.key}" title="Show orbital trails"><svg viewBox="0 0 24 24" fill="none" stroke="${g.color}" stroke-width="2"><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-25 12 12)"/><circle cx="18" cy="9" r="1.5" fill="${g.color}" stroke="none"/></svg></div><div class="catalog-group-count" id="cat-count-${g.key}">--</div>`;
+            // Trail button click handler
+            const trailBtn = row.querySelector('.catalog-trail-btn');
+            trailBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!trailBtn.classList.contains('enabled')) return;
+                toggleConstellationTrail(g.key);
+            });
+            row.addEventListener('click', () => onCatalogGroupClick(g.key));
+            catBody.appendChild(row);
+        }
+        catDiv.appendChild(catBody);
+        $body.appendChild(catDiv);
+    }
+}
+
+// Update builtin catalog counts after data loads
+function updateBuiltinCatalogCounts() {
+    const owCount = document.getElementById('cat-count-oneweb');
+    if (owCount && satellites.length) owCount.textContent = satellites.length;
+    const geoCount = document.getElementById('cat-count-eutelsat-geo');
+    if (geoCount && geoSatellites.length) geoCount.textContent = geoSatellites.length;
+    // Sync GEO row active state with geoSatsVisible
+    const geoRow = document.querySelector('.catalog-group-row[data-group-key="eutelsat-geo"]');
+    if (geoRow) geoRow.classList.toggle('active', geoSatsVisible);
+    // Enable trail button for GEO when loaded
+    if (geoSatellites.length) {
+        const geoTrailBtn = document.querySelector('.catalog-trail-btn[data-trail-key="eutelsat-geo"]');
+        if (geoTrailBtn) geoTrailBtn.classList.toggle('enabled', geoSatsVisible);
+    }
+}
+
+function _toggleBuiltinOneweb() {
+    const isVisible = satPointCloud && satPointCloud.visible;
+    const newVisible = !isVisible;
+    if (satPointCloud) satPointCloud.visible = newVisible;
+    // Update catalog row
+    const row = document.querySelector('.catalog-group-row[data-group-key="oneweb"]');
+    if (row) row.classList.toggle('active', newVisible);
+    // Show/hide OneWeb sidebar folder
+    if (_folderRefs.oneweb) _folderRefs.oneweb.style.display = newVisible ? '' : 'none';
+    // Deselect if hiding and a OneWeb sat was selected
+    if (!newVisible && selectedIndex >= 0) {
+        stopTracking();
+        const oldItem = $satList.querySelector(`.sat-item[data-index="${selectedIndex}"]`);
+        if (oldItem) oldItem.classList.remove('selected');
+        resetSatColor(selectedIndex);
+        selectedIndex = -1;
+        $detailPanel.classList.add('hidden');
+        clearOrbitPath();
+        clearCoverageFootprint();
+        clearTtcPasses();
+    }
+    // Also hide/show plane glow if active
+    if (!newVisible && selectedPlane >= 0) {
+        selectedPlane = -1;
+        removePlaneGlow();
+    }
+    // Sync constellation trail
+    const owTrail = _constellationTrails['oneweb'];
+    if (owTrail && owTrail.enabled) {
+        if (!newVisible) {
+            if (owTrail.lineSegments) owTrail.lineSegments.visible = false;
+        } else {
+            if (owTrail.lineSegments) owTrail.lineSegments.visible = true;
+            owTrail.dirty = true;
+        }
+    }
+    const owTrailBtn = document.querySelector('.catalog-trail-btn[data-trail-key="oneweb"]');
+    if (owTrailBtn) owTrailBtn.classList.toggle('enabled', newVisible);
+}
+
+function _toggleBuiltinGeo() {
+    // Toggle GEO visibility (catalog panel only — button removed)
+    geoSatsVisible = !geoSatsVisible;
+    if (geoPointCloud) geoPointCloud.visible = geoSatsVisible;
+    if (geoOrbitRing) geoOrbitRing.visible = geoSatsVisible;
+    for (const gs of geoSatellites) {
+        if (gs._el) gs._el.classList.toggle('gs-hidden', !geoSatsVisible);
+    }
+    if (geoSatsVisible) updateGeoPositions(true);
+    // Sync catalog row
+    const row = document.querySelector('.catalog-group-row[data-group-key="eutelsat-geo"]');
+    if (row) row.classList.toggle('active', geoSatsVisible);
+    // Show/hide GEO sidebar folder
+    if (_folderRefs.geo) _folderRefs.geo.style.display = geoSatsVisible ? '' : 'none';
+    // Deselect if hiding and a GEO sat was selected
+    if (!geoSatsVisible && selectedGeoIndex >= 0) {
+        closeGeoPanel();
+    }
+    // Sync constellation trail
+    const geoTrail = _constellationTrails['eutelsat-geo'];
+    if (geoTrail && geoTrail.enabled) {
+        if (!geoSatsVisible) {
+            if (geoTrail.lineSegments) geoTrail.lineSegments.visible = false;
+        } else {
+            if (geoTrail.lineSegments) geoTrail.lineSegments.visible = true;
+            geoTrail.dirty = true;
+        }
+    }
+    const geoTrailBtn = document.querySelector('.catalog-trail-btn[data-trail-key="eutelsat-geo"]');
+    if (geoTrailBtn) geoTrailBtn.classList.toggle('enabled', geoSatsVisible);
+}
+
+function onCatalogGroupClick(key) {
+    // Handle builtin groups
+    const group = CATALOG_GROUPS.find(g => g.key === key);
+    if (group && group.builtin === 'oneweb') {
+        _toggleBuiltinOneweb();
+        return;
+    }
+    if (group && group.builtin === 'geo') {
+        _toggleBuiltinGeo();
+        return;
+    }
+
+    const cs = catalogState[key];
+    if (cs && cs.loaded) {
+        toggleCatalogGroup(key);
+    } else if (cs && cs.loading) {
+        return; // already loading
+    } else {
+        loadCatalogGroup(key);
+    }
+}
+
+async function loadCatalogGroup(key, { showOnLoad = true } = {}) {
+    const group = CATALOG_GROUPS.find(g => g.key === key);
+    if (!group) return;
+
+    // Initialize state
+    if (!catalogState[key]) {
+        catalogState[key] = { satellites: [], visible: false, loaded: false, loading: false, tleText: null, frameCount: 0, baseColor: null };
+    }
+    const cs = catalogState[key];
+    if (cs.loaded) { if (showOnLoad) toggleCatalogGroup(key); return; }
+    if (cs.loading) return;
+    cs.loading = true;
+
+    // Show spinner in panel
+    const countEl = document.getElementById('cat-count-' + key);
+    if (countEl) countEl.innerHTML = '<div class="catalog-group-spinner"></div>';
+
+    const url = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=' + group.groupId + '&FORMAT=tle';
+    let tleText = null;
+    try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        tleText = await resp.text();
+    } catch (e) {
+        console.warn(`Catalog ${key} direct fetch failed, trying proxies...`, e);
+        const proxies = [
+            'https://corsproxy.io/?' + encodeURIComponent(url),
+            'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+        ];
+        for (const proxyUrl of proxies) {
+            try {
+                const resp = await fetch(proxyUrl);
+                if (!resp.ok) throw new Error(`Proxy HTTP ${resp.status}`);
+                tleText = await resp.text();
+                break;
+            } catch (pe) {
+                console.warn(`Catalog ${key} proxy failed:`, proxyUrl, pe);
+            }
+        }
+    }
+
+    if (!tleText) {
+        console.error(`All fetches failed for catalog group: ${key}`);
+        cs.loading = false;
+        if (countEl) countEl.textContent = 'ERR';
+        return;
+    }
+
+    cs.tleText = tleText;
+    await parseCatalogTLE(key, tleText);
+    createCatalogPoints(key);
+    cs.loaded = true;
+    cs.loading = false;
+    cs.visible = showOnLoad;
+
+    // Update UI
+    const row = document.querySelector(`.catalog-group-row[data-group-key="${key}"]`);
+    if (row) row.classList.toggle('active', showOnLoad);
+    if (countEl) countEl.textContent = cs.satellites.length;
+
+    // Add sidebar folder (hidden if preloaded)
+    appendCatalogFolder(key);
+    if (!showOnLoad) {
+        const folder = document.querySelector(`.folder[data-folder-id="catalog-${key}"]`);
+        if (folder) folder.style.display = 'none';
+    }
+
+    // Set visibility in merged buffer
+    if (!showOnLoad) {
+        const range = _catalogMerged.ranges[key];
+        if (range && _catalogMerged.geometry) {
+            const visAttr = _catalogMerged.geometry.getAttribute('aVisible');
+            for (let i = 0; i < range.count; i++) visAttr.setX(range.start + i, 0.0);
+            visAttr.needsUpdate = true;
+        }
+    }
+
+    // Initial position update
+    if (showOnLoad) updateCatalogPositions(key, true);
+
+    // Enable trail button now that group is loaded
+    const trailBtn = document.querySelector(`.catalog-trail-btn[data-trail-key="${key}"]`);
+    if (trailBtn) trailBtn.classList.add('enabled');
+
+    console.log(`Catalog ${key}: loaded ${cs.satellites.length} satellites`);
+}
+
+// Batched TLE parsing — yields to main thread every 200 sats to keep UI responsive
+async function parseCatalogTLE(key, text) {
+    const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const sats = [];
+    const BATCH_SIZE = 200;
+    const countEl = document.getElementById('cat-count-' + key);
+
+    // First pass: identify TLE triplets (cheap, no blocking)
+    const triplets = [];
+    for (let i = 0; i < lines.length - 2; i++) {
+        if (lines[i + 1]?.[0] === '1' && lines[i + 2]?.[0] === '2') {
+            triplets.push(i);
+            i += 2;
+        }
+    }
+
+    // Process in batches, yielding to main thread between batches
+    for (let b = 0; b < triplets.length; b += BATCH_SIZE) {
+        const end = Math.min(b + BATCH_SIZE, triplets.length);
+        for (let j = b; j < end; j++) {
+            const i = triplets[j];
+            const name = lines[i];
+            const line1 = lines[i + 1];
+            const line2 = lines[i + 2];
+            try {
+                const satrec = satellite.twoline2satrec(line1, line2);
+                if (satrec.error === 0) {
+                    const inclination = satrec.inclo * RAD2DEG;
+                    const eccentricity = satrec.ecco;
+                    const meanMotion = satrec.no * (1440 / (2 * Math.PI));
+                    const period = 1440 / meanMotion;
+                    sats.push({
+                        name, satrec, noradId: satrec.satnum,
+                        inclination, eccentricity, period,
+                        groupKey: key,
+                        lat: 0, lon: 0, alt: 0,
+                        x: 0, y: 0, z: 0,
+                        speed: 0,
+                    });
+                }
+            } catch (e) { /* skip bad TLEs */ }
+        }
+        // Yield to main thread if more batches remain
+        if (end < triplets.length) {
+            if (countEl) countEl.textContent = `${sats.length}...`;
+            await new Promise(r => setTimeout(r, 0));
+        }
+    }
+
+    sats.sort((a, b) => a.name.localeCompare(b.name));
+    catalogState[key].satellites = sats;
+}
+
+// Initialize the single merged catalog point cloud (called once on first group load)
+function _initCatalogMergedCloud() {
+    if (_catalogMerged.geometry) return;
+
+    const cap = _catalogMerged.capacity;
+    const positions = new Float32Array(cap * 3);
+    const colors = new Float32Array(cap * 3);
+    const sizes = new Float32Array(cap);
+    const visibility = new Float32Array(cap);
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+    geo.setAttribute('aVisible', new THREE.BufferAttribute(visibility, 1));
+    geo.setDrawRange(0, 0);
+
+    const mat = new THREE.ShaderMaterial({
+        uniforms: {
+            map: { value: _getSharedPointTexture() },
+            uScale: { value: window.innerHeight * (window.devicePixelRatio || 1) / 2.0 },
+        },
+        vertexShader: `
+            attribute float aSize;
+            attribute float aVisible;
+            uniform float uScale;
+            varying vec3 vColor;
+            varying float vVis;
+            void main() {
+                vColor = color;
+                vVis = aVisible;
+                vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+                gl_PointSize = aSize * (uScale / -mvPos.z) * aVisible;
+                gl_Position = projectionMatrix * mvPos;
+            }
+        `,
+        fragmentShader: `
+            uniform sampler2D map;
+            varying vec3 vColor;
+            varying float vVis;
+            void main() {
+                if (vVis < 0.5) discard;
+                vec4 texColor = texture2D(map, gl_PointCoord);
+                if (texColor.a < 0.01) discard;
+                gl_FragColor = vec4(vColor * texColor.rgb, texColor.a);
+            }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexColors: true,
+    });
+
+    const cloud = new THREE.Points(geo, mat);
+    cloud.renderOrder = 1;
+    scene.add(cloud);
+
+    _catalogMerged.geometry = geo;
+    _catalogMerged.pointCloud = cloud;
+    _catalogMerged.material = mat;
+}
+
+// Grow merged buffer when capacity is exceeded
+function _growCatalogMergedBuffer(needed) {
+    const newCap = Math.max(needed * 2, _catalogMerged.capacity * 2);
+    const oldGeo = _catalogMerged.geometry;
+    const oldPos = oldGeo.getAttribute('position').array;
+    const oldCol = oldGeo.getAttribute('color').array;
+    const oldSiz = oldGeo.getAttribute('aSize').array;
+    const oldVis = oldGeo.getAttribute('aVisible').array;
+    const used = _catalogMerged.totalUsed;
+
+    const positions = new Float32Array(newCap * 3);
+    const colors = new Float32Array(newCap * 3);
+    const sizes = new Float32Array(newCap);
+    const visibility = new Float32Array(newCap);
+
+    positions.set(oldPos.subarray(0, used * 3));
+    colors.set(oldCol.subarray(0, used * 3));
+    sizes.set(oldSiz.subarray(0, used));
+    visibility.set(oldVis.subarray(0, used));
+
+    oldGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    oldGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    oldGeo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+    oldGeo.setAttribute('aVisible', new THREE.BufferAttribute(visibility, 1));
+
+    _catalogMerged.capacity = newCap;
+}
+
+// Map a merged buffer index back to { groupKey, localIndex }
+function _catalogMergedIndexToGroup(mergedIdx) {
+    for (const key of Object.keys(_catalogMerged.ranges)) {
+        const r = _catalogMerged.ranges[key];
+        if (mergedIdx >= r.start && mergedIdx < r.start + r.count) {
+            return { groupKey: key, localIndex: mergedIdx - r.start };
+        }
+    }
+    return null;
+}
+
+function createCatalogPoints(key) {
+    const cs = catalogState[key];
+    const group = CATALOG_GROUPS.find(g => g.key === key);
+    const count = cs.satellites.length;
+    if (count === 0) return;
+
+    _initCatalogMergedCloud();
+
+    // Grow buffer if needed
+    const needed = _catalogMerged.totalUsed + count;
+    if (needed > _catalogMerged.capacity) {
+        _growCatalogMergedBuffer(needed);
+    }
+
+    const start = _catalogMerged.totalUsed;
+    _catalogMerged.ranges[key] = { start, count };
+    _catalogMerged.totalUsed += count;
+
+    // Set colors, sizes, visibility for this range
+    const colAttr = _catalogMerged.geometry.getAttribute('color');
+    const sizeAttr = _catalogMerged.geometry.getAttribute('aSize');
+    const visAttr = _catalogMerged.geometry.getAttribute('aVisible');
+
+    cs.baseColor = new THREE.Color(group.color);
+    for (let i = 0; i < count; i++) {
+        const gi = start + i;
+        colAttr.setXYZ(gi, cs.baseColor.r, cs.baseColor.g, cs.baseColor.b);
+        sizeAttr.setX(gi, group.size);
+        visAttr.setX(gi, 1.0);
+    }
+
+    colAttr.needsUpdate = true;
+    sizeAttr.needsUpdate = true;
+    visAttr.needsUpdate = true;
+
+    // Extend draw range to cover all loaded sats
+    _catalogMerged.geometry.setDrawRange(0, _catalogMerged.totalUsed);
+}
+
+function updateCatalogPositions(key, force) {
+    const cs = catalogState[key];
+    const range = _catalogMerged.ranges[key];
+    if (!cs || !cs.satellites.length || !range || !_catalogMerged.geometry) return;
+    if (!force && !cs.visible) return;
+
+    const posAttr = _catalogMerged.geometry.getAttribute('position');
+    const gmst = satellite.gstime(simTime);
+
+    for (let i = 0; i < cs.satellites.length; i++) {
+        const sat = cs.satellites[i];
+        const posVel = satellite.propagate(sat.satrec, simTime);
+
+        if (posVel.position && typeof posVel.position !== 'boolean') {
+            const eci = posVel.position;
+            const geo = satellite.eciToGeodetic(eci, gmst);
+            sat.lat = satellite.degreesLat(geo.latitude);
+            sat.lon = satellite.degreesLong(geo.longitude);
+            sat.alt = geo.height;
+
+            sat.eciX = eci.x; sat.eciY = eci.y; sat.eciZ = eci.z;
+
+            if (posVel.velocity) {
+                const v = posVel.velocity;
+                sat.speed = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+                sat.eciVx = v.x; sat.eciVy = v.y; sat.eciVz = v.z;
+            }
+
+            if (referenceFrame === 'eci') {
+                const s = SAT_SCALE;
+                sat.x = eci.x * s; sat.y = eci.z * s; sat.z = -eci.y * s;
+            } else {
+                geoToVec3Into(sat.lat, sat.lon, sat.alt, _geoOut);
+                sat.x = _geoOut.x; sat.y = _geoOut.y; sat.z = _geoOut.z;
+            }
+
+            posAttr.setXYZ(range.start + i, sat.x, sat.y, sat.z);
+        }
+    }
+
+    posAttr.needsUpdate = true;
+
+    // Keep highlight sprite in sync
+    if (_catalogHighlightSprite && _catalogHighlightSprite.visible && selectedCatalogGroup === key && selectedCatalogIndex >= 0) {
+        const sel = cs.satellites[selectedCatalogIndex];
+        if (sel) _catalogHighlightSprite.position.set(sel.x, sel.y, sel.z);
+    }
+}
+
+function toggleCatalogGroup(key) {
+    const cs = catalogState[key];
+    if (!cs || !cs.loaded) return;
+
+    cs.visible = !cs.visible;
+
+    // Set visibility attribute in merged buffer
+    const range = _catalogMerged.ranges[key];
+    if (range && _catalogMerged.geometry) {
+        const visAttr = _catalogMerged.geometry.getAttribute('aVisible');
+        const val = cs.visible ? 1.0 : 0.0;
+        for (let i = 0; i < range.count; i++) {
+            visAttr.setX(range.start + i, val);
+        }
+        visAttr.needsUpdate = true;
+    }
+
+    // Update panel row
+    const row = document.querySelector(`.catalog-group-row[data-group-key="${key}"]`);
+    if (row) row.classList.toggle('active', cs.visible);
+
+    // Force position update when toggling on
+    if (cs.visible) {
+        updateCatalogPositions(key, true);
+    }
+
+    // Deselect if toggled-off group had selected sat
+    if (!cs.visible && selectedCatalogGroup === key) {
+        clearCatalogSelection();
+    }
+
+    // Show/hide sidebar folder
+    const folder = document.querySelector(`.folder[data-folder-id="catalog-${key}"]`);
+    if (folder) folder.style.display = cs.visible ? '' : 'none';
+
+    // Sync constellation trail visibility
+    const trail = _constellationTrails[key];
+    if (trail && trail.enabled) {
+        if (!cs.visible) {
+            if (trail.lineSegments) trail.lineSegments.visible = false;
+        } else {
+            if (trail.lineSegments) trail.lineSegments.visible = true;
+            trail.dirty = true;
+        }
+    }
+    // Update trail button enabled state
+    const trailBtn = document.querySelector(`.catalog-trail-btn[data-trail-key="${key}"]`);
+    if (trailBtn) trailBtn.classList.toggle('enabled', cs.visible);
+}
+
+function isCatalogSatVisible(key, idx) {
+    const cs = catalogState[key];
+    if (!cs) return false;
+    const sat = cs.satellites[idx];
+    _satPos.set(sat.x, sat.y, sat.z);
+    _camToStation.copy(_satPos).sub(camera.position).normalize();
+    raycaster.set(camera.position, _camToStation);
+    const hit = raycaster.ray.intersectSphere(_earthSphere, _intersectPt);
+    if (!hit) return true;
+    const distToSat = camera.position.distanceTo(_satPos);
+    return camera.position.distanceTo(_intersectPt) >= distToSat * 0.98;
+}
+
+function _showCatalogHighlightSprite(sat) {
+    if (!_catalogHighlightSprite) {
+        const mat = new THREE.SpriteMaterial({ map: _getSharedPointTexture(), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+        _catalogHighlightSprite = new THREE.Sprite(mat);
+        _catalogHighlightSprite.renderOrder = 2;
+        scene.add(_catalogHighlightSprite);
+    }
+    _catalogHighlightSprite.position.set(sat.x, sat.y, sat.z);
+    _catalogHighlightSprite.scale.set(1.0, 1.0, 1);
+    _catalogHighlightSprite.visible = true;
+}
+
+function clearCatalogSelection() {
+    if (selectedCatalogGroup && selectedCatalogIndex >= 0) {
+        const cs = catalogState[selectedCatalogGroup];
+        const range = _catalogMerged.ranges[selectedCatalogGroup];
+        if (cs && range && _catalogMerged.geometry) {
+            const colAttr = _catalogMerged.geometry.getAttribute('color');
+            colAttr.setXYZ(range.start + selectedCatalogIndex, cs.baseColor.r, cs.baseColor.g, cs.baseColor.b);
+            colAttr.needsUpdate = true;
+        }
+        // Remove selection in sidebar
+        const oldItem = $satList.querySelector(`.catalog-sat-item.selected`);
+        if (oldItem) oldItem.classList.remove('selected');
+    }
+    if (_catalogHighlightSprite) _catalogHighlightSprite.visible = false;
+    selectedCatalogGroup = null;
+    selectedCatalogIndex = -1;
+}
+
+function selectCatalogSatellite(groupKey, idx) {
+    // Deselect any existing OneWeb selection
+    if (selectedIndex >= 0) {
+        if (trackingIndex >= 0) stopTracking();
+        $detailPanel.classList.add('hidden');
+        clearTtcPasses();
+        const oldItem = $satList.querySelector(`.sat-item[data-index="${selectedIndex}"]`);
+        if (oldItem) oldItem.classList.remove('selected');
+        resetSatColor(selectedIndex);
+        selectedIndex = -1;
+        clearOrbitPath();
+        clearCoverageFootprint();
+    }
+    // Deselect GEO
+    closeGeoPanel();
+    // Deselect plane
+    if (selectedPlane >= 0) {
+        selectedPlane = -1;
+        removePlaneGlow();
+        restoreAllSatColors();
+    }
+
+    // Toggle off if re-clicking
+    if (selectedCatalogGroup === groupKey && selectedCatalogIndex === idx) {
+        clearCatalogSelection();
+        $detailPanel.classList.add('hidden');
+        clearOrbitPath();
+        return;
+    }
+
+    // Clear previous catalog selection
+    clearCatalogSelection();
+
+    selectedCatalogGroup = groupKey;
+    selectedCatalogIndex = idx;
+    const cs = catalogState[groupKey];
+    const sat = cs.satellites[idx];
+
+    // Highlight dot → white in merged buffer
+    const range = _catalogMerged.ranges[groupKey];
+    if (range && _catalogMerged.geometry) {
+        const colAttr = _catalogMerged.geometry.getAttribute('color');
+        colAttr.setXYZ(range.start + idx, 1, 1, 1);
+        colAttr.needsUpdate = true;
+    }
+    _showCatalogHighlightSprite(sat);
+
+    // Highlight in sidebar
+    const newItem = $satList.querySelector(`.catalog-sat-item[data-group="${groupKey}"][data-cat-index="${idx}"]`);
+    if (newItem) {
+        let parentFolder = newItem.closest('.folder.collapsed');
+        while (parentFolder) {
+            parentFolder.classList.remove('collapsed');
+            parentFolder = parentFolder.parentElement && parentFolder.parentElement.closest('.folder.collapsed');
+        }
+        newItem.classList.add('selected');
+    }
+
+    // Populate detail panel with catalog sat info
+    const group = CATALOG_GROUPS.find(g => g.key === groupKey);
+    $detailName.textContent = sat.name;
+    $detailPanel.classList.remove('hidden');
+
+    // Hide OneWeb-specific buttons
+    document.getElementById('detail-alarm').style.display = 'none';
+    document.getElementById('detail-beams').style.display = 'none';
+
+    // Update detail panel fields
+    updateCatalogDetailPanel(groupKey, idx);
+
+    // Show orbit path
+    showCatalogOrbitPath(groupKey, idx);
+}
+
+function updateCatalogDetailPanel(groupKey, idx) {
+    const cs = catalogState[groupKey];
+    if (!cs) return;
+    const sat = cs.satellites[idx];
+    const group = CATALOG_GROUPS.find(g => g.key === groupKey);
+
+    $detailName.textContent = sat.name;
+    $detailLat.textContent = sat.lat.toFixed(3) + '\u00B0';
+    $detailLon.textContent = sat.lon.toFixed(3) + '\u00B0';
+    $detailAlt.textContent = Math.round(sat.alt).toLocaleString() + ' km';
+    $detailVel.textContent = (sat.speed || 0).toFixed(1) + ' km/s';
+
+    if (sat.eciX !== undefined && sat.eciVx !== undefined) {
+        const _mu = 398600.4418;
+        const _rx = sat.eciX, _ry = sat.eciY, _rz = sat.eciZ;
+        const _vx = sat.eciVx, _vy = sat.eciVy, _vz = sat.eciVz;
+        const _rM = Math.sqrt(_rx*_rx + _ry*_ry + _rz*_rz);
+        const _vM = Math.sqrt(_vx*_vx + _vy*_vy + _vz*_vz);
+        const _hx = _ry*_vz - _rz*_vy, _hy = _rz*_vx - _rx*_vz, _hz = _rx*_vy - _ry*_vx;
+        const _hM = Math.sqrt(_hx*_hx + _hy*_hy + _hz*_hz);
+        const _vxh_x = _vy*_hz - _vz*_hy, _vxh_y = _vz*_hx - _vx*_hz, _vxh_z = _vx*_hy - _vy*_hx;
+        const _ex = _vxh_x/_mu - _rx/_rM, _ey = _vxh_y/_mu - _ry/_rM, _ez = _vxh_z/_mu - _rz/_rM;
+        const oscEcc = Math.sqrt(_ex*_ex + _ey*_ey + _ez*_ez);
+        const oscInc = Math.acos(Math.max(-1, Math.min(1, _hz / _hM))) * RAD2DEG;
+        const oscA = 1 / (2/_rM - _vM*_vM/_mu);
+        const oscPeriod = 2 * Math.PI * Math.sqrt(oscA*oscA*oscA / _mu) / 60;
+        const _nnx = -_hy, _nny = _hx;
+        const _nM = Math.sqrt(_nnx*_nnx + _nny*_nny);
+        let oscRaan = 0;
+        if (_nM > 1e-10) {
+            oscRaan = Math.acos(Math.max(-1, Math.min(1, _nnx / _nM)));
+            if (_nny < 0) oscRaan = 2*Math.PI - oscRaan;
+        }
+        const nx = Math.cos(oscRaan), ny = Math.sin(oscRaan);
+        const px = _rx * nx + _ry * ny;
+        const py = (-_rx * ny + _ry * nx) * Math.cos(oscInc * DEG2RAD) + _rz * Math.sin(oscInc * DEG2RAD);
+        const aol = ((Math.atan2(py, px) * RAD2DEG) % 360 + 360) % 360;
+
+        $detailInc.textContent = oscInc.toFixed(2) + '\u00B0';
+        $detailEcc.textContent = oscEcc.toFixed(6);
+        $detailRaan.textContent = (oscRaan * RAD2DEG).toFixed(2) + '\u00B0';
+        $detailAol.textContent = aol.toFixed(2) + '\u00B0';
+        $detailPeriod.textContent = oscPeriod.toFixed(1) + ' min';
+    } else {
+        $detailInc.textContent = sat.inclination.toFixed(2) + '\u00B0';
+        $detailEcc.textContent = sat.eccentricity.toFixed(6);
+        const raan = (sat.satrec.nodeo * RAD2DEG % 360 + 360) % 360;
+        $detailRaan.textContent = raan.toFixed(2) + '\u00B0';
+        $detailAol.textContent = '--';
+        $detailPeriod.textContent = sat.period.toFixed(1) + ' min';
+    }
+
+    $detailNorad.textContent = sat.noradId;
+
+    // TLE age
+    var tleEpochMs = (sat.satrec.jdsatepoch - 2440587.5) * 86400000;
+    var tleAgeDays = (Date.now() - tleEpochMs) / 86400000;
+    if (tleAgeDays < 1) {
+        $detailTleAge.textContent = Math.floor(tleAgeDays * 24) + 'h';
+        $detailTleAge.style.color = 'var(--success)';
+    } else if (tleAgeDays < 3) {
+        $detailTleAge.textContent = tleAgeDays.toFixed(1) + ' days';
+        $detailTleAge.style.color = 'var(--success)';
+    } else if (tleAgeDays < 7) {
+        $detailTleAge.textContent = tleAgeDays.toFixed(1) + ' days';
+        $detailTleAge.style.color = '#ffeb3b';
+    } else {
+        $detailTleAge.textContent = tleAgeDays.toFixed(1) + ' days';
+        $detailTleAge.style.color = '#ff5252';
+    }
+
+    $detailPlane.textContent = group ? group.label : groupKey;
+    $detailFormation.textContent = '\u2014';
+    $detailFormation.style.color = '';
+}
+
+function showCatalogOrbitPath(groupKey, idx) {
+    const cs = catalogState[groupKey];
+    if (!cs) { clearOrbitPath(); return; }
+    const sat = cs.satellites[idx];
+    if (!sat || !sat.satrec) { clearOrbitPath(); return; }
+
+    const group = CATALOG_GROUPS.find(g => g.key === groupKey);
+    const period = sat.period * 60 * 1000;
+    const hiSpeed = Math.abs(timeMultiplier) > 50;
+    const steps = hiSpeed ? 80 : 200;
+    const stepMs = period / steps;
+
+    const pts = [];
+    for (let s = 0; s <= steps; s++) {
+        const t = new Date(simTime.getTime() + s * stepMs);
+        const posVel = satellite.propagate(sat.satrec, t);
+        if (!posVel.position || typeof posVel.position === 'boolean') continue;
+        const eci = posVel.position;
+        if (referenceFrame === 'eci') {
+            pts.push(new THREE.Vector3(eci.x * SAT_SCALE, eci.z * SAT_SCALE, -eci.y * SAT_SCALE));
+        } else {
+            const gmst = satellite.gstime(t);
+            const geo = satellite.eciToGeodetic(eci, gmst);
+            pts.push(geoToVec3(satellite.degreesLat(geo.latitude), satellite.degreesLong(geo.longitude), geo.height));
+        }
+    }
+
+    const pastSteps = hiSpeed ? 40 : 100;
+    const pastStepMs = (period * 0.5) / pastSteps;
+    const pastPts = [];
+    for (let s = pastSteps; s >= 0; s--) {
+        const t = new Date(simTime.getTime() - s * pastStepMs);
+        const posVel = satellite.propagate(sat.satrec, t);
+        if (!posVel.position || typeof posVel.position === 'boolean') continue;
+        const eci = posVel.position;
+        if (referenceFrame === 'eci') {
+            pastPts.push(new THREE.Vector3(eci.x * SAT_SCALE, eci.z * SAT_SCALE, -eci.y * SAT_SCALE));
+        } else {
+            const gmst = satellite.gstime(t);
+            const geo = satellite.eciToGeodetic(eci, gmst);
+            pastPts.push(geoToVec3(satellite.degreesLat(geo.latitude), satellite.degreesLong(geo.longitude), geo.height));
+        }
+    }
+
+    const lineColor = group ? new THREE.Color(group.color) : new THREE.Color(0xb388ff);
+
+    // Reuse existing line buffers instead of dispose+recreate
+    if (groundTrack) groundTrack.visible = false;
+    if (pastGroundTrack) pastGroundTrack.visible = false;
+    orbitLine = _updateLine(orbitLine, pts, lineColor, 0.5, false, 2);
+    pastOrbitLine = _updateLine(pastOrbitLine, pastPts, lineColor, 0.2, false, 2);
+}
+
+function appendCatalogFolder(key) {
+    const cs = catalogState[key];
+    const group = CATALOG_GROUPS.find(g => g.key === key);
+    if (!cs || !group) return;
+
+    // Remove existing folder if any
+    const existing = $satList.querySelector(`.folder[data-folder-id="catalog-${key}"]`);
+    if (existing) existing.remove();
+
+    const colorClass = 'accent-purple';
+    const folder = _createFolder('catalog-' + key, group.label.toUpperCase(), cs.satellites.length, false, colorClass);
+    folder.classList.add('collapsed');
+    folder.querySelector('.folder-label').style.color = group.color;
+    const body = folder.querySelector('.folder-body');
+
+    if (cs.satellites.length <= 200) {
+        // Individual items
+        cs.satellites.forEach((sat, i) => {
+            const div = document.createElement('div');
+            div.className = 'sat-item catalog-sat-item';
+            div.dataset.group = key;
+            div.dataset.catIndex = i;
+            div.innerHTML = `<div class="sat-dot" style="background:${group.color}"></div><div class="sat-info"><div class="sat-name">${sat.name}</div><div class="sat-meta">${group.label} &middot; ID ${sat.noradId}</div></div>`;
+            div.addEventListener('click', () => selectCatalogSatellite(key, i));
+            body.appendChild(div);
+        });
+    } else {
+        // Summary for large groups
+        const info = document.createElement('div');
+        info.className = 'sat-item';
+        info.style.opacity = '0.6';
+        info.style.cursor = 'default';
+        info.innerHTML = `<div class="sat-info"><div class="sat-name">${cs.satellites.length} satellites</div><div class="sat-meta">Use search to find individual sats</div></div>`;
+        body.appendChild(info);
+    }
+
+    $satList.appendChild(folder);
+}
+
+// ============================================================
 // SATELLITE RENDERING
 // ============================================================
 function createSatellitePoints() {
@@ -3395,18 +4468,19 @@ function createSatellitePoints() {
     satGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     satColorAttr = satGeometry.getAttribute('color');
 
-    // Point texture
+    // Point texture (HD 128x128)
     const canvas = document.createElement('canvas');
-    canvas.width = 64;
-    canvas.height = 64;
+    canvas.width = 128;
+    canvas.height = 128;
     const ctx = canvas.getContext('2d');
-    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
     gradient.addColorStop(0, 'rgba(255,255,255,1)');
-    gradient.addColorStop(0.2, 'rgba(255,255,255,0.9)');
-    gradient.addColorStop(0.5, 'rgba(255,255,255,0.3)');
+    gradient.addColorStop(0.15, 'rgba(255,255,255,0.95)');
+    gradient.addColorStop(0.35, 'rgba(255,255,255,0.5)');
+    gradient.addColorStop(0.6, 'rgba(255,255,255,0.12)');
     gradient.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 64, 64);
+    ctx.fillRect(0, 0, 128, 128);
     const pointTexture = new THREE.CanvasTexture(canvas);
 
     const mat = new THREE.PointsMaterial({
@@ -3677,6 +4751,63 @@ function makeLine(pts, color, opacity, additive) {
     return line;
 }
 
+// Reuse existing line geometry buffer instead of dispose+recreate
+function _updateLine(existingLine, pts, color, opacity, additive, renderOrder) {
+    if (pts.length < 2) {
+        if (existingLine) return disposeLine(existingLine);
+        return null;
+    }
+    if (existingLine) {
+        const posAttr = existingLine.geometry.getAttribute('position');
+        const needed = pts.length * 3;
+        if (posAttr && posAttr.array.length >= needed) {
+            for (let i = 0; i < pts.length; i++) {
+                posAttr.array[i * 3] = pts[i].x;
+                posAttr.array[i * 3 + 1] = pts[i].y;
+                posAttr.array[i * 3 + 2] = pts[i].z;
+            }
+            posAttr.needsUpdate = true;
+            existingLine.geometry.setDrawRange(0, pts.length);
+        } else {
+            existingLine.geometry.dispose();
+            const maxPts = Math.max(pts.length, 500);
+            const positions = new Float32Array(maxPts * 3);
+            for (let i = 0; i < pts.length; i++) {
+                positions[i * 3] = pts[i].x;
+                positions[i * 3 + 1] = pts[i].y;
+                positions[i * 3 + 2] = pts[i].z;
+            }
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geo.setDrawRange(0, pts.length);
+            existingLine.geometry = geo;
+        }
+        existingLine.material.color.set(color);
+        existingLine.material.opacity = opacity;
+        existingLine.visible = true;
+        return existingLine;
+    }
+    // Create new with pre-allocated buffer
+    const maxPts = Math.max(pts.length, 500);
+    const positions = new Float32Array(maxPts * 3);
+    for (let i = 0; i < pts.length; i++) {
+        positions[i * 3] = pts[i].x;
+        positions[i * 3 + 1] = pts[i].y;
+        positions[i * 3 + 2] = pts[i].z;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setDrawRange(0, pts.length);
+    const mat = new THREE.LineBasicMaterial({
+        color, transparent: true, opacity, depthWrite: false,
+        blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
+    });
+    const line = new THREE.Line(geo, mat);
+    line.renderOrder = renderOrder || 0;
+    scene.add(line);
+    return line;
+}
+
 function disposeLine(line) {
     if (!line) return null;
     scene.remove(line);
@@ -3686,8 +4817,7 @@ function disposeLine(line) {
 }
 
 function showOrbitPath(satIndex) {
-    clearOrbitPath();
-    if (satIndex < 0 || satIndex >= satellites.length) return;
+    if (satIndex < 0 || satIndex >= satellites.length) { clearOrbitPath(); return; }
 
     const sat = satellites[satIndex];
     const periodMs = sat.period * 60 * 1000;
@@ -3698,15 +4828,25 @@ function showOrbitPath(satIndex) {
     const hiSpeed = Math.abs(timeMultiplier) > 50;
 
     if (isTracking) {
-        // Past: vivid green, 2 revolutions back
+        // Hide forward lines
+        if (orbitLine) orbitLine.visible = false;
+        if (groundTrack) groundTrack.visible = false;
+        // Past: vivid green, 2 revolutions back — reuse buffers
         const past = computePathPoints(sat, nowMs - periodMs * 2, nowMs, hiSpeed ? 150 : 400);
-        pastOrbitLine = makeLine(past.orbitPts, 0x00ff88, 0.85, true);
-        if (past.trackPts.length > 1) pastGroundTrack = makeLine(past.trackPts, 0x00ff88, 0.2, false);
+        pastOrbitLine = _updateLine(pastOrbitLine, past.orbitPts, 0x00ff88, 0.85, true, 0);
+        pastGroundTrack = past.trackPts.length > 1
+            ? _updateLine(pastGroundTrack, past.trackPts, 0x00ff88, 0.2, false, 0)
+            : (pastGroundTrack ? disposeLine(pastGroundTrack) : null);
     } else {
-        // Default select: orange, 1 revolution forward
+        // Hide past lines
+        if (pastOrbitLine) pastOrbitLine.visible = false;
+        if (pastGroundTrack) pastGroundTrack.visible = false;
+        // Default select: orange, 1 revolution forward — reuse buffers
         const fwd = computePathPoints(sat, nowMs, nowMs + periodMs, hiSpeed ? 80 : 200);
-        orbitLine = makeLine(fwd.orbitPts, 0xff6b35, 0.6, false);
-        if (fwd.trackPts.length > 1) groundTrack = makeLine(fwd.trackPts, 0xff6b35, 0.15, false);
+        orbitLine = _updateLine(orbitLine, fwd.orbitPts, 0xff6b35, 0.6, false, 0);
+        groundTrack = fwd.trackPts.length > 1
+            ? _updateLine(groundTrack, fwd.trackPts, 0xff6b35, 0.15, false, 0)
+            : (groundTrack ? disposeLine(groundTrack) : null);
     }
 }
 
@@ -4055,6 +5195,236 @@ function clearOrbitPath() {
     groundTrack = disposeLine(groundTrack);
     pastOrbitLine = disposeLine(pastOrbitLine);
     pastGroundTrack = disposeLine(pastGroundTrack);
+}
+
+// ============================================================
+// CONSTELLATION TRAIL LINES
+// ============================================================
+
+function _trailParams(satCount) {
+    if (satCount > 3000) return { maxSats: 200, steps: 40 };
+    if (satCount > 500) return { maxSats: 300, steps: 60 };
+    if (satCount > 200) return { maxSats: satCount, steps: 60 };
+    if (satCount > 50) return { maxSats: satCount, steps: 80 };
+    return { maxSats: satCount, steps: 120 };
+}
+
+function _resolveTrailSats(key) {
+    const group = CATALOG_GROUPS.find(g => g.key === key);
+    if (!group) return null;
+    if (group.builtin === 'oneweb') return satellites;
+    if (group.builtin === 'geo') return geoSatellites;
+    const cs = catalogState[key];
+    return (cs && cs.loaded) ? cs.satellites : null;
+}
+
+function _isGroupVisible(key) {
+    const group = CATALOG_GROUPS.find(g => g.key === key);
+    if (!group) return false;
+    if (group.builtin === 'oneweb') return satPointCloud && satPointCloud.visible;
+    if (group.builtin === 'geo') return geoSatsVisible;
+    const cs = catalogState[key];
+    return cs && cs.loaded && cs.visible;
+}
+
+async function computeConstellationTrail(key) {
+    const sats = _resolveTrailSats(key);
+    if (!sats || sats.length === 0) return null;
+
+    const { maxSats, steps } = _trailParams(sats.length);
+    const isEci = referenceFrame === 'eci';
+    const sc = SAT_SCALE;
+
+    // Evenly sample if exceeding maxSats
+    let indices;
+    if (sats.length <= maxSats) {
+        indices = Array.from({ length: sats.length }, (_, i) => i);
+    } else {
+        indices = [];
+        const step = sats.length / maxSats;
+        for (let i = 0; i < maxSats; i++) {
+            indices.push(Math.floor(i * step));
+        }
+    }
+
+    const now = simTime.getTime();
+    // LineSegments format: pairs of adjacent points (A0,A1, A1,A2, ..., An-1,An) per sat
+    // Each sat produces `steps` segments = `steps * 2` vertices
+    const totalVerts = indices.length * steps * 2;
+    const positions = new Float32Array(totalVerts * 3);
+    let writeIdx = 0;
+    const BATCH_SIZE = 50;
+
+    for (let b = 0; b < indices.length; b += BATCH_SIZE) {
+        const end = Math.min(b + BATCH_SIZE, indices.length);
+        for (let si = b; si < end; si++) {
+            const sat = sats[indices[si]];
+            if (!sat.satrec) continue;
+            const periodMs = (sat.period || 90) * 60 * 1000;
+            const dt = periodMs / steps;
+
+            // Compute orbit points
+            let prevX, prevY, prevZ;
+            let hasPrev = false;
+            for (let s = 0; s <= steps; s++) {
+                const t = new Date(now + s * dt);
+                const pv = satellite.propagate(sat.satrec, t);
+                if (!pv.position || typeof pv.position === 'boolean') {
+                    hasPrev = false;
+                    continue;
+                }
+                let px, py, pz;
+                if (isEci) {
+                    const e = pv.position;
+                    px = e.x * sc; py = e.z * sc; pz = -e.y * sc;
+                } else {
+                    const gmst = satellite.gstime(t);
+                    const geo = satellite.eciToGeodetic(pv.position, gmst);
+                    const latR = geo.latitude;
+                    const lonR = geo.longitude;
+                    const r = (EARTH_RADIUS_KM + geo.height) * sc;
+                    const cLat = Math.cos(latR), sLat = Math.sin(latR);
+                    const cLon = Math.cos(lonR), sLon = Math.sin(lonR);
+                    px = r * cLat * cLon;
+                    py = r * sLat;
+                    pz = -r * cLat * sLon;
+                }
+                if (hasPrev) {
+                    positions[writeIdx++] = prevX;
+                    positions[writeIdx++] = prevY;
+                    positions[writeIdx++] = prevZ;
+                    positions[writeIdx++] = px;
+                    positions[writeIdx++] = py;
+                    positions[writeIdx++] = pz;
+                }
+                prevX = px; prevY = py; prevZ = pz;
+                hasPrev = true;
+            }
+        }
+        // Yield to main thread
+        if (end < indices.length) {
+            await new Promise(r => setTimeout(r, 0));
+        }
+    }
+
+    return { positions, vertexCount: writeIdx / 3, sampledCount: indices.length, stepsPerSat: steps };
+}
+
+function buildTrailLineSegments(key, data) {
+    const group = CATALOG_GROUPS.find(g => g.key === key);
+    const color = group ? group.color : '#ffffff';
+    const trail = _constellationTrails[key];
+
+    if (trail && trail.lineSegments) {
+        // Reuse if buffer large enough
+        const posAttr = trail.geometry.getAttribute('position');
+        if (posAttr.array.length >= data.vertexCount * 3) {
+            posAttr.array.set(data.positions.subarray(0, data.vertexCount * 3));
+            posAttr.needsUpdate = true;
+            trail.geometry.setDrawRange(0, data.vertexCount);
+            trail.lineSegments.visible = true;
+            return;
+        }
+        // Buffer too small — dispose and recreate
+        scene.remove(trail.lineSegments);
+        trail.geometry.dispose();
+        trail.material.dispose();
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(data.positions, 3));
+    geo.setDrawRange(0, data.vertexCount);
+    const mat = new THREE.LineBasicMaterial({
+        color, transparent: true, opacity: 0.18,
+        depthWrite: false, blending: THREE.AdditiveBlending,
+    });
+    const ls = new THREE.LineSegments(geo, mat);
+    scene.add(ls);
+
+    _constellationTrails[key] = {
+        lineSegments: ls, geometry: geo, material: mat,
+        enabled: true, dirty: false, computing: false,
+        lastComputeMs: performance.now(),
+        sampledCount: data.sampledCount,
+        stepsPerSat: data.stepsPerSat,
+        satCount: (_resolveTrailSats(key) || []).length,
+    };
+}
+
+function removeTrailLineSegments(key) {
+    const trail = _constellationTrails[key];
+    if (!trail) return;
+    if (trail.lineSegments) {
+        scene.remove(trail.lineSegments);
+        trail.geometry.dispose();
+        trail.material.dispose();
+    }
+    delete _constellationTrails[key];
+}
+
+async function toggleConstellationTrail(key) {
+    const trail = _constellationTrails[key];
+    if (trail && trail.enabled) {
+        // Disable
+        trail.enabled = false;
+        if (trail.lineSegments) trail.lineSegments.visible = false;
+        removeTrailLineSegments(key);
+        _updateTrailBtnState(key, false);
+        return;
+    }
+
+    // Enable — compute and build
+    if (!_isGroupVisible(key)) return;
+    _updateTrailBtnState(key, true);
+    const data = await computeConstellationTrail(key);
+    if (data && data.vertexCount > 0) {
+        buildTrailLineSegments(key, data);
+    }
+}
+
+function _updateTrailBtnState(key, active) {
+    const btn = document.querySelector(`.catalog-trail-btn[data-trail-key="${key}"]`);
+    if (btn) btn.classList.toggle('active', active);
+}
+
+function updateConstellationTrails() {
+    const speed = Math.abs(timeMultiplier || 1);
+    const interval = speed > 100 ? 1000 : speed > 10 ? 2000 : 4000;
+    const now = performance.now();
+
+    for (const key of Object.keys(_constellationTrails)) {
+        const trail = _constellationTrails[key];
+        if (!trail.enabled) continue;
+
+        // Hide trail if source group is no longer visible
+        if (!_isGroupVisible(key)) {
+            if (trail.lineSegments) trail.lineSegments.visible = false;
+            continue;
+        } else if (trail.lineSegments && !trail.lineSegments.visible) {
+            trail.lineSegments.visible = true;
+        }
+
+        // Time-based recomputation
+        if (trail.computing) continue;
+        if (trail.dirty || (now - trail.lastComputeMs > interval)) {
+            trail.computing = true;
+            trail.dirty = false;
+            computeConstellationTrail(key).then(data => {
+                trail.computing = false;
+                if (data && data.vertexCount > 0 && trail.enabled) {
+                    buildTrailLineSegments(key, data);
+                    trail.lastComputeMs = performance.now();
+                }
+            });
+        }
+    }
+}
+
+function clearAllConstellationTrails() {
+    for (const key of Object.keys(_constellationTrails)) {
+        removeTrailLineSegments(key);
+        _updateTrailBtnState(key, false);
+    }
 }
 
 // ============================================================
@@ -5324,6 +6694,72 @@ function filterSatList(query) {
         item.style.display = (geoMatch || nameMatch) && ql ? '' : 'none';
         item.classList.toggle('selected', gi === selectedGeoIndex);
     });
+
+    // Show/hide catalog satellite items (+ dynamic search for large groups)
+    if (ql) {
+        for (const key of Object.keys(catalogState)) {
+            const cs = catalogState[key];
+            if (!cs.visible || !cs.loaded) continue;
+            const folder = $satList.querySelector(`.folder[data-folder-id="catalog-${key}"]`);
+            if (!folder) continue;
+
+            if (cs.satellites.length <= 200) {
+                // Filter existing DOM items
+                const catItems = folder.querySelectorAll('.catalog-sat-item');
+                catItems.forEach(item => {
+                    const ci = parseInt(item.dataset.catIndex, 10);
+                    const sat = cs.satellites[ci];
+                    if (!sat) { item.style.display = 'none'; return; }
+                    const match = sat.name.toLowerCase().includes(ql) || String(sat.noradId).includes(ql);
+                    item.style.display = match ? '' : 'none';
+                });
+            } else {
+                // Dynamic search for large groups: create up to 20 result items
+                const body = folder.querySelector('.folder-body');
+                body.innerHTML = '';
+                const group = CATALOG_GROUPS.find(g => g.key === key);
+                let count = 0;
+                for (let i = 0; i < cs.satellites.length && count < 20; i++) {
+                    const sat = cs.satellites[i];
+                    if (sat.name.toLowerCase().includes(ql) || String(sat.noradId).includes(ql)) {
+                        const div = document.createElement('div');
+                        div.className = 'sat-item catalog-sat-item';
+                        div.dataset.group = key;
+                        div.dataset.catIndex = i;
+                        div.innerHTML = `<div class="sat-dot" style="background:${group ? group.color : '#b388ff'}"></div><div class="sat-info"><div class="sat-name">${sat.name}</div><div class="sat-meta">${group ? group.label : key} &middot; ID ${sat.noradId}</div></div>`;
+                        div.addEventListener('click', () => selectCatalogSatellite(key, i));
+                        body.appendChild(div);
+                        count++;
+                    }
+                }
+                if (count === 0) {
+                    const info = document.createElement('div');
+                    info.className = 'sat-item'; info.style.opacity = '0.5'; info.style.cursor = 'default';
+                    info.innerHTML = `<div class="sat-info"><div class="sat-name">No matches</div></div>`;
+                    body.appendChild(info);
+                } else if (count >= 20) {
+                    const info = document.createElement('div');
+                    info.className = 'sat-item'; info.style.opacity = '0.5'; info.style.cursor = 'default';
+                    info.innerHTML = `<div class="sat-info"><div class="sat-meta">Showing first 20 results</div></div>`;
+                    body.appendChild(info);
+                }
+            }
+        }
+    } else {
+        // Restore large group folders to summary view when search cleared
+        for (const key of Object.keys(catalogState)) {
+            const cs = catalogState[key];
+            if (!cs.visible || !cs.loaded || cs.satellites.length <= 200) continue;
+            const folder = $satList.querySelector(`.folder[data-folder-id="catalog-${key}"]`);
+            if (!folder) continue;
+            const body = folder.querySelector('.folder-body');
+            body.innerHTML = '';
+            const info = document.createElement('div');
+            info.className = 'sat-item'; info.style.opacity = '0.6'; info.style.cursor = 'default';
+            info.innerHTML = `<div class="sat-info"><div class="sat-name">${cs.satellites.length} satellites</div><div class="sat-meta">Use search to find individual sats</div></div>`;
+            body.appendChild(info);
+        }
+    }
 }
 
 // ============================================================
@@ -5331,7 +6767,11 @@ function filterSatList(query) {
 // ============================================================
 function selectSatellite(index) {
     closeGeoPanel();
+    clearCatalogSelection();
     clearOrbitalViz();
+    // Show OneWeb-specific buttons
+    document.getElementById('detail-alarm').style.display = '';
+    document.getElementById('detail-beams').style.display = '';
     // Clear plane selection if active
     if (selectedPlane >= 0) {
         const oldPlaneItem = $satList.querySelector('.plane-item.selected');
@@ -6661,7 +8101,29 @@ function processMouseHover() {
             }
         }
 
-        if (geoHit) { /* already showing tooltip */ }
+        // Check catalog satellite hover — single merged cloud raycast
+        let catalogHit = false;
+        if (!geoHit && _catalogMerged.pointCloud && _catalogMerged.totalUsed > 0) {
+            const catHits = raycaster.intersectObject(_catalogMerged.pointCloud);
+            for (let i = 0; i < catHits.length; i++) {
+                const mapped = _catalogMergedIndexToGroup(catHits[i].index);
+                if (!mapped) continue;
+                const cs = catalogState[mapped.groupKey];
+                if (!cs || !cs.visible) continue;
+                if (isCatalogSatVisible(mapped.groupKey, mapped.localIndex)) {
+                    const sat = cs.satellites[mapped.localIndex];
+                    const group = CATALOG_GROUPS.find(g => g.key === mapped.groupKey);
+                    showTooltip(
+                        `<strong>${sat.name}</strong><br>${group ? group.label : mapped.groupKey} &middot; Alt: ${Math.round(sat.alt)} km`,
+                        tx, ty, 'pointer'
+                    );
+                    catalogHit = true;
+                    break;
+                }
+            }
+        }
+
+        if (geoHit || catalogHit) { /* already showing tooltip */ }
         // Check sun/moon hover (only when no satellite hit)
         else {
         let celestialHit = false;
@@ -6711,12 +8173,31 @@ function onMouseClick(event) {
             }
         }
     }
+
+    // Check catalog satellites — single merged cloud raycast
+    if (_catalogMerged.pointCloud && _catalogMerged.totalUsed > 0) {
+        const catHits = raycaster.intersectObject(_catalogMerged.pointCloud);
+        for (let i = 0; i < catHits.length; i++) {
+            const mapped = _catalogMergedIndexToGroup(catHits[i].index);
+            if (!mapped) continue;
+            const cs = catalogState[mapped.groupKey];
+            if (!cs || !cs.visible) continue;
+            if (isCatalogSatVisible(mapped.groupKey, mapped.localIndex)) {
+                selectCatalogSatellite(mapped.groupKey, mapped.localIndex);
+                return;
+            }
+        }
+    }
 }
 
 function onResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    // Update merged catalog shader scale uniform
+    if (_catalogMerged.material) {
+        _catalogMerged.material.uniforms.uScale.value = window.innerHeight * (window.devicePixelRatio || 1) / 2.0;
+    }
 }
 
 // ============================================================
@@ -7266,8 +8747,13 @@ document.getElementById('detail-close').addEventListener('click', () => {
         $detailPanel.classList.add('hidden');
         $ttcPanelSvalbard.classList.remove('visible');
         $ttcPanelInuvik.classList.remove('visible');
+    } else if (selectedCatalogGroup && selectedCatalogIndex >= 0) {
+        // Catalog satellite selected — clear it
+        clearCatalogSelection();
+        $detailPanel.classList.add('hidden');
+        clearOrbitPath();
     } else {
-        // Desktop: full deselect
+        // Desktop: full deselect (OneWeb)
         stopTracking();
         const oldItem = document.querySelector(`.sat-item[data-index="${selectedIndex}"]`);
         if (oldItem) oldItem.classList.remove('selected');
@@ -7472,6 +8958,22 @@ function animate(now) {
         }
     }
 
+    // Update catalog satellite positions — adaptive per group size
+    for (const key of Object.keys(catalogState)) {
+        const cs = catalogState[key];
+        if (!cs.visible || !cs.loaded || !_catalogMerged.ranges[key]) continue;
+        cs.frameCount++;
+        const n = cs.satellites.length;
+        const absM = Math.abs(timeMultiplier);
+        let catInterval;
+        if (n > 3000) catInterval = absM > 100 ? 4 : absM > 10 ? 8 : 16;
+        else if (n > 200) catInterval = absM > 100 ? 2 : absM > 10 ? 4 : 8;
+        else catInterval = absM > 100 ? 1 : absM > 10 ? 2 : 4;
+        if (cs.frameCount % catInterval === 0) {
+            updateCatalogPositions(key, false);
+        }
+    }
+
     // Update beam footprints
     if (beamMode === 'individual') {
         updateCoverageFootprint();
@@ -7487,11 +8989,18 @@ function animate(now) {
     const pathInterval = Math.max(3, Math.floor(150 / Math.abs(timeMultiplier || 1)));
     if (selectedIndex >= 0 && !orbitalVizMode && frameCount % pathInterval === 0) {
         showOrbitPath(selectedIndex);
+    } else if (selectedCatalogGroup && selectedCatalogIndex >= 0 && frameCount % pathInterval === 0) {
+        showCatalogOrbitPath(selectedCatalogGroup, selectedCatalogIndex);
     }
+
+    // Update constellation trail lines
+    if (frameCount % 30 === 0) updateConstellationTrails();
 
     // Update detail panel
     const detailInterval = Math.max(2, Math.floor(30 / Math.abs(timeMultiplier || 1)));
-    if (selectedIndex >= 0 && frameCount % detailInterval === 0) {
+    if (selectedCatalogGroup && selectedCatalogIndex >= 0 && frameCount % detailInterval === 0) {
+        updateCatalogDetailPanel(selectedCatalogGroup, selectedCatalogIndex);
+    } else if (selectedIndex >= 0 && frameCount % detailInterval === 0) {
         updateDetailPanel();
         updateTtcPassDisplay();
     }
@@ -7751,6 +9260,22 @@ loadTLEData();
 loadGeoTLEData();
 animate(performance.now());
 
+// Background-load all catalog groups after a short delay so the UI is responsive first
+setTimeout(() => {
+    const groups = CATALOG_GROUPS.filter(g => !g.builtin);
+    let i = 0;
+    function loadNext() {
+        if (i >= groups.length) return;
+        const g = groups[i++];
+        const cs = catalogState[g.key];
+        if (cs && cs.loaded) { loadNext(); return; }
+        loadCatalogGroup(g.key, { showOnLoad: false }).then(() => setTimeout(loadNext, 300));
+    }
+    // Load 2 in parallel, staggered
+    loadNext();
+    setTimeout(loadNext, 150);
+}, 2000);
+
 // TT&C toggle
 document.getElementById('toggle-ttc').addEventListener('click', () => {
     ttcVisible = !ttcVisible;
@@ -7776,41 +9301,14 @@ document.getElementById('toggle-gw').addEventListener('click', () => {
 });
 
 
-// GEO satellites toggle
-document.getElementById('toggle-geo').addEventListener('click', () => {
-    geoSatsVisible = !geoSatsVisible;
-    document.getElementById('toggle-geo').classList.toggle('active-geo', geoSatsVisible);
-    if (geoPointCloud) geoPointCloud.visible = geoSatsVisible;
-    if (geoOrbitRing) geoOrbitRing.visible = geoSatsVisible;
-    for (const gs of geoSatellites) {
-        if (gs._el) gs._el.classList.toggle('gs-hidden', !geoSatsVisible);
-    }
-    // Force position update when toggling on
-    if (geoSatsVisible) {
-        updateGeoPositions(true);
-        // Save current camera state before zooming out
-        const cp = camera.position;
-        const dist = cp.length();
-        const curLat = Math.asin(cp.y / dist);
-        const curLon = Math.atan2(cp.z, cp.x);
-        const targetLat = 0.47;
-        const targetDist = Math.max(dist, 115);
-        if (dist < 100 || Math.abs(curLat - 0.47) > 0.15) {
-            _geoPreViewPos = camera.position.clone();
-            _geoPreViewTarget = controls.target.clone();
-            animateCameraToVizView(targetLat, curLon, targetDist);
-        }
-    } else if (_geoPreViewPos) {
-        // Restore camera to pre-GEO view
-        const saved = _geoPreViewPos;
-        const savedDist = saved.length();
-        const savedLat = Math.asin(saved.y / savedDist);
-        const savedLon = Math.atan2(saved.z, saved.x);
-        animateCameraToVizView(savedLat, savedLon, savedDist);
-        _geoPreViewPos = null;
-        _geoPreViewTarget = null;
-    }
+// Stars toggle
+let starsVisible = true;
+document.getElementById('toggle-stars').addEventListener('click', () => {
+    starsVisible = !starsVisible;
+    document.getElementById('toggle-stars').classList.toggle('active-stars', starsVisible);
+    if (starField) starField.visible = starsVisible;
 });
+
 
 // SAA zone toggle
 document.getElementById('toggle-saa').addEventListener('click', () => {
@@ -7818,6 +9316,59 @@ document.getElementById('toggle-saa').addEventListener('click', () => {
     document.getElementById('toggle-saa').classList.toggle('active-saa', saaVisible);
     if (saaMesh) saaMesh.visible = saaVisible;
     if (saaOutline) saaOutline.visible = saaVisible;
+});
+
+// Catalog toggle
+document.getElementById('toggle-catalog').addEventListener('click', () => {
+    catalogPanelOpen = !catalogPanelOpen;
+    document.getElementById('toggle-catalog').classList.toggle('active-catalog', catalogPanelOpen);
+    document.getElementById('catalog-panel').classList.toggle('open', catalogPanelOpen);
+});
+document.getElementById('catalog-close').addEventListener('click', () => {
+    catalogPanelOpen = false;
+    document.getElementById('toggle-catalog').classList.remove('active-catalog');
+    document.getElementById('catalog-panel').classList.remove('open');
+});
+buildCatalogPanel();
+
+// Select All / Deselect All
+document.getElementById('catalog-select-all').addEventListener('click', () => {
+    const btn = document.getElementById('catalog-select-all');
+    const isAllOn = btn.textContent === 'All On';
+
+    if (isAllOn) {
+        // Turn everything on
+        // OneWeb builtin
+        if (satPointCloud && !satPointCloud.visible) _toggleBuiltinOneweb();
+        // GEO builtin
+        if (!geoSatsVisible) _toggleBuiltinGeo();
+        // All catalog groups: load unloaded, show hidden — parallel fetch
+        const loadPromises = [];
+        for (const g of CATALOG_GROUPS) {
+            if (g.builtin) continue;
+            const cs = catalogState[g.key];
+            if (!cs || !cs.loaded) {
+                loadPromises.push(loadCatalogGroup(g.key));
+            } else if (!cs.visible) {
+                toggleCatalogGroup(g.key);
+            }
+        }
+        if (loadPromises.length > 0) Promise.all(loadPromises);
+        btn.textContent = 'All Off';
+    } else {
+        // Turn everything off
+        if (satPointCloud && satPointCloud.visible) _toggleBuiltinOneweb();
+        if (geoSatsVisible) _toggleBuiltinGeo();
+        for (const key of Object.keys(catalogState)) {
+            const cs = catalogState[key];
+            if (cs && cs.loaded && cs.visible) {
+                toggleCatalogGroup(key);
+            }
+        }
+        // Clear all constellation trails
+        clearAllConstellationTrails();
+        btn.textContent = 'All On';
+    }
 });
 
 // Sun lighting toggle
@@ -7891,6 +9442,12 @@ function setReferenceFrame(frame) {
     clearOrbitPath();
     if (selectedIndex >= 0 && !orbitalVizMode) {
         showOrbitPath(selectedIndex);
+    }
+
+    // Mark all active constellation trails as dirty for recompute in new frame
+    for (const key of Object.keys(_constellationTrails)) {
+        const trail = _constellationTrails[key];
+        if (trail.enabled) trail.dirty = true;
     }
 
     // Force immediate sun/light update to prevent lighting flicker
