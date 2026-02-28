@@ -1,5 +1,24 @@
 # OneWeb Constellation Tracker — Changelog
 
+## v14 — Plane Folders, Formation Badges & Alarm Reliability (2026-02-28)
+**Backup:** `index_v14_planes_alarms.html`
+
+### Changed
+- **Plane sub-folders**: Replaced SUPERSMASH / MONSTER MASH sub-folders inside ONEWEB with Plane 1–12 (and Unassigned) sub-folders. Satellites are grouped by orbital plane; all plane folders start collapsed.
+- **Formation badges**: Formation status now shown as inline badges on satellite list items — green "SS" for SUPERSMASH, purple "MM" for MONSTER MASH — instead of moving satellites between folders.
+- **Formation field in detail panel**: New "Formation" field between Plane and Follow button shows SUPERSMASH (green) or MONSTER MASH (purple) for satellites in a formation.
+- **Formation search result count**: Searching "supersmash" or "monster mash" now shows a count header (e.g. "SUPERSMASH — 14 satellites").
+- **Follow button full-width**: Follow button now spans both columns of the detail grid.
+- **Plane renumbering**: Plane classification now uses reference satellites (0102→9, 0027→10, 0015→11, 0017→12) to assign correct plane numbers; remaining planes numbered 1–8 in RAAN order.
+
+### Fixed
+- **Alarms now use real wall-clock time**: Both TT&C and manual alarms compare against `Date.now()` instead of simulation time, so alarms always fire at the correct real time regardless of sim speed or time jumps.
+- **Alarms independent of UI state**: `checkAllTtcAlarms()` now runs independently every 30 frames, no longer gated by detail panel visibility or satellite selection.
+- **Removed `_liveMode` guard on alarms**: Speed slider changes and time jumps no longer disable alarm checking.
+- **`_ttcAlarms` cleared on TLE reload**: `restoreAlarmsFromStorage()` now clears the alarm map before restoring, preventing stale satellite indices after array re-sorting.
+
+---
+
 ## v13 — Orbital Element Plot Popup & GEO Camera Restore (2026-02-28)
 **Backup:** `index_v13_plot.html`
 
